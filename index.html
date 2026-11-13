@@ -5,100 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2214%22 fill=%22%232f8f83%22/%3E%3C/svg%3E">
 <meta name="theme-color" content="#1f2a2e">
-<title>WNDR · calm places to work &amp; record — DFW + Austin · Presented by Chambers Creations, LLC</title>
-<meta name="description" content="WNDR: chill work spots and podcast studios across Dallas, Fort Worth, and Austin. Presented by Chambers Creations, LLC.">
+<title>WNDR · calm places to work &amp; record · Presented by Chambers Creations, LLC</title>
+<meta name="description" content="WNDR: calm work spots and podcast studios in Dallas, Fort Worth, Austin, Oklahoma City, Edmond, Guthrie, Tupelo, San Diego and Northern New Mexico. Presented by Chambers Creations, LLC.">
 <meta name="author" content="Chambers Creations, LLC">
 <meta property="og:title" content="WNDR — presented by Chambers Creations, LLC">
-<meta property="og:description" content="Chill work spots and podcast studios across Dallas, Fort Worth, and Austin.">
+<meta property="og:description" content="Calm work spots and podcast studios: DFW, Austin, OKC, Edmond, Guthrie, Tupelo, San Diego, Santa Fe, Taos, Red River and Angel Fire.">
+<link rel="preload" href="data/index.json" as="fetch" crossorigin="anonymous">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 /* =====================================================================
-   WNDR DATA — edit here to add spots. One object per line.
-   Work spot fields: id, region ("Dallas" | "Fort Worth" | "Austin"), area, name,
-     type, setting (include "patio"/"outdoor"/"rooftop"/"terrace"/"garden"/"deck"
-     to count as outdoor), address, lat, lng, vibe, wifi, hours, url, phone,
-     source (URL backing the vibe note), sourceName.
-   Podcast fields: id, region, area, name, cost ("Free" | "Paid"), rate, address,
-     lat, lng, hours, book, contact, url, note.
+   WNDR — spot data lives in data/<region>.json (one file per region) and
+   data/index.json lists every region's center, bounds, counts and spot ids.
+   Region files load only when you tap a chip or pan the map into a region.
    Leave a field "" when unknown. Never guess.
    ===================================================================== */
-const CHECKED = "Nov 12, 2026";
-
-const WORK = [
-  {"id": "d1", "region": "Dallas", "area": "Lake Highlands", "name": "Half Price Books Flagship + La Casita Coffee", "type": "Bookstore café", "setting": "Indoor", "address": "5803 E Northwest Hwy, Dallas, TX 75231", "lat": 32.8662736, "lng": -96.7648171, "vibe": "La Casita Bakeshop's café inside the HPB flagship; Dallasites101 calls it a quiet, cozy workspace with espresso and the smell of books.", "wifi": "", "hours": "Store 9 AM–10 PM daily (OSM)", "url": "https://www.hpb.com/store?storeid=HPB-001", "phone": "214-379-8000", "source": "https://www.dallasites101.com/blog/post/coffee-shops-for-working-remote-in-dallas/", "sourceName": "Dallasites101"},
-  {"id": "d2", "region": "Dallas", "area": "Deep Ellum", "name": "Murray Street Coffee Shop", "type": "Coffee shop", "setting": "Indoor", "address": "103 Murray St, Dallas, TX 75226", "lat": 32.7849358, "lng": -96.777921, "vibe": "Two floors with loft-style seating; the upstairs is the move for heads-down sessions, the ground floor livelier.", "wifi": "Wi-Fi and outlets reported by remote-work guides", "hours": "", "url": "https://www.murraystreetcoffee.com", "phone": "214-655-2808", "source": "https://brewatlas.co/blog/best-coffee-shops-to-work-from-dallas", "sourceName": "BrewAtlas"},
-  {"id": "d3", "region": "Dallas", "area": "Henderson Ave / East Dallas", "name": "Houndstooth Coffee – North Henderson", "type": "Coffee shop", "setting": "Indoor", "address": "1900 N Henderson Ave, Dallas, TX 75206", "lat": 32.8114685, "lng": -96.7743641, "vibe": "Rustic room with enough tables to spread out; works for quiet typing or a short call from a corner.", "wifi": "Outlets exist but get claimed early", "hours": "Mon–Sun 7 AM–2 PM", "url": "https://houndstoothcoffee.com/cafes/henderson-ave/", "phone": "972-863-9080", "source": "https://brewatlas.co/blog/best-coffee-shops-to-work-from-dallas", "sourceName": "BrewAtlas"},
-  {"id": "d4", "region": "Dallas", "area": "Lake Highlands", "name": "White Rock Coffee", "type": "Coffee shop", "setting": "Indoor + patio", "address": "10105 E Northwest Hwy, Dallas, TX 75238", "lat": 32.86463, "lng": -96.712296, "vibe": "Spacious indoor and outdoor seating and a calm ambience; one of the easier places in north Dallas to get a real table.", "wifi": "Wi-Fi reported", "hours": "6 AM–8 PM daily (OSM)", "url": "https://wrcoffee.com/", "phone": "214-341-4774", "source": "https://brewatlas.co/blog/best-coffee-shops-to-work-from-dallas", "sourceName": "BrewAtlas"},
-  {"id": "d5", "region": "Dallas", "area": "Harwood District", "name": "Magnolias Sous Le Pont", "type": "Coffee shop", "setting": "Indoor", "address": "2727 N Harwood St, Dallas, TX 75201", "lat": 32.7931347, "lng": -96.8074518, "vibe": "Dim lighting, a relaxed French-inspired room and local art; a good place to get in the zone.", "wifi": "", "hours": "Daily 7 AM–5 PM", "url": "https://www.magnoliasdallas.com/", "phone": "469-249-9222", "source": "https://www.dallasites101.com/blog/post/coffee-shops-for-working-remote-in-dallas/", "sourceName": "Dallasites101"},
-  {"id": "d6", "region": "Dallas", "area": "Downtown", "name": "Otto's Coffee & Fine Foods (The Adolphus)", "type": "Hotel café", "setting": "Indoor", "address": "1321 Commerce St, Dallas, TX 75202", "lat": 32.7796627, "lng": -96.8004011, "vibe": "Viennese-style coffee in the grand Adolphus hotel; suggested as an ideal spot to meet someone for a conversation.", "wifi": "", "hours": "", "url": "https://www.marriott.com/en-us/hotels/dalak-the-adolphus-autograph-collection/dining/", "phone": "", "source": "https://www.dallasites101.com/blog/post/coffee-shops-for-working-remote-in-dallas/", "sourceName": "Dallasites101"},
-  {"id": "d7", "region": "Dallas", "area": "Lower Greenville", "name": "Halcyon", "type": "Café + bar", "setting": "Indoor + patio", "address": "2900 Greenville Ave, Dallas, TX 75206", "lat": 32.8241455, "lng": -96.7699269, "vibe": "Natural light and room to spread out; open late for night sessions (evenings bring live music and wine).", "wifi": "", "hours": "Mon–Thu 7 AM–10 PM; Fri 7 AM–11 PM; Sat 8 AM–11 PM; Sun 8 AM–8 PM", "url": "https://www.halcyoncoffeebar.com/dallas", "phone": "", "source": "https://www.dallasites101.com/blog/post/coffee-shops-for-working-remote-in-dallas/", "sourceName": "Dallasites101"},
-  {"id": "d8", "region": "Dallas", "area": "Victory Park", "name": "Katy Coffee Lab", "type": "Coffee shop", "setting": "Indoor + terrace", "address": "3111 N Houston St, Dallas, TX 75219", "lat": 32.7942125, "lng": -96.812689, "vibe": "Sleek, minimalist lobby café with plenty of tables; reviewers love the peaceful atmosphere and rarely feel crammed.", "wifi": "", "hours": "Daily 7 AM–3 PM", "url": "https://www.thekatydallas.com/coffee/", "phone": "469-225-2642", "source": "https://www.dallasites101.com/blog/post/coffee-shops-for-working-remote-in-dallas/", "sourceName": "Dallasites101"},
-  {"id": "d9", "region": "Dallas", "area": "Downtown", "name": "J. Erik Jonsson Central Library", "type": "Library", "setting": "Indoor", "address": "1515 Young St, Dallas, TX 75201", "lat": 32.7783221, "lng": -96.7949328, "vibe": "Dallas's main library, with quiet floors to work on; the 3rd-floor Story Center is the free podcast studio.", "wifi": "Free library Wi-Fi", "hours": "Mon closed; Tue & Thu 9 AM–8 PM; Wed & Fri 9 AM–5 PM; Sat–Sun 9 AM–4 PM", "url": "https://www.dallaslibrary.org/central-library", "phone": "214-670-1400", "source": "https://www.dallaslibrary.org/central-library", "sourceName": "Dallas Public Library"},
-  {"id": "d10", "region": "Dallas", "area": "Uptown / Downtown", "name": "Klyde Warren Park", "type": "Park", "setting": "Outdoor", "address": "2012 Woodall Rodgers Fwy, Dallas, TX 75201", "lat": 32.7897931, "lng": -96.8011736, "vibe": "Five acres of deck-park green space with tables scattered throughout; food trucks daily for a lunch break.", "wifi": "Free park Wi-Fi", "hours": "Daily 6 AM–11 PM", "url": "https://www.klydewarrenpark.org/", "phone": "214-716-4500", "source": "https://www.visitdallas.com/blog/coworking-spaces-in-dallas/", "sourceName": "Visit Dallas"},
-  {"id": "d11", "region": "Dallas", "area": "Oak Cliff", "name": "Slow and Steady Coffee", "type": "Coffee shop", "setting": "Indoor", "address": "1805 S Edgefield Ave, Dallas, TX 75224", "lat": 32.7278562, "lng": -96.8445257, "vibe": "Genuinely spacious neighborhood shop where you are not on top of the next table; a great heads-down option.", "wifi": "Wi-Fi reported", "hours": "Mon–Fri 6:30 AM–3 PM; Sat 7 AM–3 PM; Sun 8 AM–1 PM (OSM)", "url": "https://slowandsteady.coffee/", "phone": "972-885-7343", "source": "https://brewatlas.co/blog/best-coffee-shops-to-work-from-dallas", "sourceName": "BrewAtlas"},
-  {"id": "d12", "region": "Dallas", "area": "Bishop Arts", "name": "The Wild Detectives", "type": "Bookstore café", "setting": "Indoor + patio", "address": "314 W 8th St, Dallas, TX 75208", "lat": 32.7478753, "lng": -96.8272523, "vibe": "Coffee shop, bar and bookstore in a renovated house; cozy and eclectic, a natural place to meet a collaborator.", "wifi": "Free Wi-Fi", "hours": "Opens 10 AM, until midnight (Visit Dallas)", "url": "https://thewilddetectives.com/", "phone": "214-942-0108", "source": "https://www.visitdallas.com/blog/coworking-spaces-in-dallas/", "sourceName": "Visit Dallas"},
-  {"id": "d13", "region": "Dallas", "area": "North Dallas", "name": "Fretz Park Branch Library", "type": "Library", "setting": "Indoor", "address": "6990 Belt Line Rd, Dallas, TX 75254", "lat": 32.9498778, "lng": -96.7848521, "vibe": "Renovated branch with high ceilings and big windows full of natural light; plenty of comfortable seating.", "wifi": "Free library Wi-Fi", "hours": "Mon, Wed, Fri 9 AM–5 PM; Tue & Thu 9 AM–8 PM; Sat 9 AM–4 PM; Sun closed", "url": "https://www.dallaslibrary.org/branches/fretz-park-branch-library", "phone": "214-670-6421", "source": "https://www.visitdallas.com/blog/coworking-spaces-in-dallas/", "sourceName": "Visit Dallas"},
-  {"id": "d14", "region": "Dallas", "area": "Richardson", "name": "La Souq", "type": "Coffee shop", "setting": "Indoor", "address": "150 W Main St, Suite 900, Richardson, TX 75081", "lat": 32.9496926, "lng": -96.7327719, "vibe": "Mediterranean-inspired micro-roastery with a light, airy, modern room built for an inspired workday.", "wifi": "", "hours": "8 AM–10 PM (site listing)", "url": "https://lasouq.com/", "phone": "", "source": "https://www.dallasites101.com/blog/post/coffee-shops-for-working-remote-in-dallas/", "sourceName": "Dallasites101"},
-  {"id": "f1", "region": "Fort Worth", "area": "West 7th", "name": "Avoca Coffee Roasters – West 7th", "type": "Coffee shop", "setting": "Indoor + patio", "address": "835 Foch St, Fort Worth, TX 76107", "lat": 32.7507456, "lng": -97.3563889, "vibe": "Locals on r/FortWorth call the Foch St shop relatively quiet; reviewers note roomy seating, a big patio and local art.", "wifi": "", "hours": "Mon–Sat 7 AM–7 PM; Sun 8 AM–4 PM", "url": "https://www.avocacoffee.com/west-7th/", "phone": "", "source": "https://www.atly.com/united-states/texas/fort-worth/best-cafe-work-friendly", "sourceName": "Atly"},
-  {"id": "f2", "region": "Fort Worth", "area": "Polytechnic / East FW", "name": "Black Coffee", "type": "Coffee shop", "setting": "Indoor + patio", "address": "1417 Vaughn Blvd, Fort Worth, TX 76105", "lat": 32.7305098, "lng": -97.2794892, "vibe": "Small shop with beautiful artwork and cozy private seating; reviewers tag it quiet and comfortable.", "wifi": "", "hours": "Mon–Sat 7 AM–5 PM; Sun 8 AM–3 PM (OSM)", "url": "https://www.blackcoffeefw.com/", "phone": "817-782-9867", "source": "https://www.atly.com/united-states/texas/fort-worth/best-cafe-work-friendly", "sourceName": "Atly"},
-  {"id": "f3", "region": "Fort Worth", "area": "Northside", "name": "Portico Coffee", "type": "Coffee shop", "setting": "Indoor + garden", "address": "2503 Roosevelt Ave, Fort Worth, TX 76164", "lat": 32.7901109, "lng": -97.3684481, "vibe": "Historic house with a quaint garden; reviewers call it quiet and cozy with four separate seating areas.", "wifi": "Free Wi-Fi", "hours": "Mon closed; Tue–Thu 8 AM–4 PM (site)", "url": "https://noble595.wixsite.com/porticocoffee", "phone": "", "source": "https://www.atly.com/united-states/texas/fort-worth/best-cafe-work-friendly", "sourceName": "Atly"},
-  {"id": "f4", "region": "Fort Worth", "area": "North Fort Worth", "name": "Good Company Coffee", "type": "Coffee shop", "setting": "Indoor + patio", "address": "5723 Golden Triangle Blvd, Fort Worth, TX 76244", "lat": 32.9348193, "lng": -97.261382, "vibe": "Quiet energy, workstations with plugs, office chairs and a reservable conference room for private talks.", "wifi": "Plenty of outlets", "hours": "", "url": "https://gccoffeehouse.com/", "phone": "817-228-3040", "source": "https://www.atly.com/united-states/texas/fort-worth/best-cafe-work-friendly", "sourceName": "Atly"},
-  {"id": "f5", "region": "Fort Worth", "area": "Downtown", "name": "Hogan Alley", "type": "Café + bar", "setting": "Indoor + patio", "address": "901 Houston St, Suite 102, Fort Worth, TX 76102", "lat": 32.7516587, "lng": -97.330161, "vibe": "Reviewers call it a chill, work-friendly spot with good Wi-Fi and a calm atmosphere; coffee by day, cocktails late.", "wifi": "Good Wi-Fi", "hours": "Mon–Wed 7 AM–10 PM; Thu–Fri 7 AM–12 AM; Sat 8 AM–12 AM; Sun 8 AM–10 PM (OSM)", "url": "https://hoganalley.com/", "phone": "817-484-4791", "source": "https://www.atly.com/united-states/texas/fort-worth/best-cafe-work-friendly", "sourceName": "Atly"},
-  {"id": "f6", "region": "Fort Worth", "area": "West 7th", "name": "Ampersand – West 7th", "type": "Café + bar", "setting": "Indoor + patio", "address": "3009 Bledsoe St, Fort Worth, TX 76107", "lat": 32.7482552, "lng": -97.3604761, "vibe": "Dim lighting and cozy cubby seating by day; skip Fri/Sat nights, when it turns into a club.", "wifi": "Solid Wi-Fi, multiple outlets", "hours": "Coffee daily 7 AM–7 PM", "url": "https://www.ampersandtx.com/locations", "phone": "", "source": "https://www.atly.com/united-states/texas/fort-worth/best-cafe-work-friendly", "sourceName": "Atly"},
-  {"id": "f7", "region": "Fort Worth", "area": "Downtown / Lancaster", "name": "Sons Coffee", "type": "Coffee shop", "setting": "Indoor + patio", "address": "250 W Lancaster Ave, Fort Worth, TX 76102", "lat": 32.7468826, "lng": -97.3294101, "vibe": "Downtown Fort Worth Inc. highlights its Wi-Fi, abundance of outlets, outdoor seating and quieter work areas.", "wifi": "Wi-Fi, lots of outlets", "hours": "7 AM–7 PM daily (OSM)", "url": "https://sonscoffee.com", "phone": "817-330-6865", "source": "https://www.dfwi.org/go/sons-coffee", "sourceName": "Downtown Fort Worth Inc."},
-  {"id": "f8", "region": "Fort Worth", "area": "Camp Bowie", "name": "Fort Worth Coffee Co.", "type": "Coffee shop", "setting": "Indoor", "address": "4731 Camp Bowie Blvd, Fort Worth, TX 76107", "lat": 32.7391778, "lng": -97.3900581, "vibe": "Westside coffeehouse up front with a members' workspace in the back; a steady, work-minded crowd.", "wifi": "", "hours": "Daily 7 AM–6 PM", "url": "https://www.fwcoffeeco.com/", "phone": "", "source": "https://www.fwcoffeeco.com/", "sourceName": "Fort Worth Coffee Co."},
-  {"id": "f9", "region": "Fort Worth", "area": "Arlington", "name": "George W. Hawkes Downtown Library", "type": "Library", "setting": "Indoor + rooftop", "address": "100 S Center St, Arlington, TX 76010", "lat": 32.7368681, "lng": -97.1075911, "vibe": "Modern library with the Sun Club Garden rooftop patio, open during library hours via the 3rd-floor desk.", "wifi": "Free library Wi-Fi", "hours": "Mon–Thu 9 AM–9 PM; Fri–Sat 9 AM–6 PM; Sun 2–6 PM", "url": "https://arlingtonlibrary.org/locations", "phone": "817-459-6900", "source": "https://arlingtonlibrary.org/locations", "sourceName": "Arlington Public Library"},
-  {"id": "f10", "region": "Fort Worth", "area": "Heritage / North FW", "name": "Harvest Coffee + Kitchen", "type": "Coffee shop", "setting": "Indoor", "address": "2725 Heritage Trace Pkwy, Fort Worth, TX 76177", "lat": 32.9147622, "lng": -97.3199211, "vibe": "Cozy, modern room with soft lighting and lots of comfortable seating; reviewers call it inviting and peaceful.", "wifi": "Reliable Wi-Fi", "hours": "", "url": "https://harvestcoffeedfw.com/", "phone": "817-953-4080", "source": "https://www.atly.com/united-states/texas/fort-worth/best-cafe-work-friendly", "sourceName": "Atly"},
-  {"id": "f11", "region": "Fort Worth", "area": "East FW business park", "name": "Bean Coffee Co.", "type": "Coffee shop", "setting": "Indoor", "address": "7251 Stoneway Dr N, Suite 300, Fort Worth, TX 76118", "lat": 32.7889534, "lng": -97.22269, "vibe": "Wide-open, bright room with a calm, quiet feel; reviewers say there are outlets at every table.", "wifi": "Outlets at every table", "hours": "", "url": "https://joe.coffee/locations/tx/fort-worth/bean-coffee-co-fort-worth/", "phone": "", "source": "https://www.atly.com/united-states/texas/fort-worth/best-cafe-work-friendly", "sourceName": "Atly"},
-  {"id": "f12", "region": "Fort Worth", "area": "Golden Triangle", "name": "Axiom Coffee", "type": "Coffee shop", "setting": "Indoor + patio", "address": "4005 Golden Triangle Blvd, Fort Worth, TX 76244", "lat": 32.9315743, "lng": -97.2910779, "vibe": "Large back room that stays quiet and peaceful for long sessions, plus a patio with a fire pit.", "wifi": "Free Wi-Fi", "hours": "", "url": "https://axiomcoffee.com/", "phone": "817-832-2728", "source": "https://www.atly.com/united-states/texas/fort-worth/best-cafe-work-friendly", "sourceName": "Atly"},
-  {"id": "a1", "region": "Austin", "area": "Downtown", "name": "Austin Central Library + Café Crème", "type": "Library", "setting": "Indoor + rooftop", "address": "710 W Cesar Chavez St, Austin, TX 78701", "lat": 30.2660164, "lng": -97.7517064, "vibe": "Six floors, a rooftop deck and excellent internet; the 4th-floor Reading Room is the quiet zone, Café Crème downstairs.", "wifi": "Fast free Wi-Fi", "hours": "Mon–Thu 9 AM–8 PM; Fri 9 AM–5 PM; Sat 10 AM–5 PM; Sun 12–5 PM (OSM)", "url": "https://library.austintexas.gov/", "phone": "", "source": "https://www.austintexas.org/austin-insider-blog/blog/post/places-to-work-remotely/", "sourceName": "Visit Austin"},
-  {"id": "a2", "region": "Austin", "area": "Hyde Park", "name": "Flightpath Coffeehouse", "type": "Coffee shop", "setting": "Indoor", "address": "5011 Duval St, Austin, TX 78751", "lat": 30.3138337, "lng": -97.7199873, "vibe": "Very much a quiet space; the unspoken rule is you step outside for calls. Outlets are plentiful.", "wifi": "Plentiful outlets", "hours": "Daily 7 AM–7 PM", "url": "https://www.instagram.com/theflightpathcoffeehouse/", "phone": "", "source": "https://www.theinfatuation.com/austin/guides/the-best-austin-coffee-shops-for-doing-work", "sourceName": "The Infatuation"},
-  {"id": "a3", "region": "Austin", "area": "East Austin", "name": "Sa-Tén", "type": "Café", "setting": "Indoor", "address": "916 Springdale Rd, Bldg 3, Austin, TX 78702", "lat": 30.2618847, "lng": -97.6990092, "vibe": "Modern, minimalist and relaxed; packed with quiet laptop workers and Japanese toast and matcha.", "wifi": "Plenty of outlets", "hours": "Daily 7 AM–9 PM", "url": "https://www.sa-ten.com/", "phone": "512-524-1544", "source": "https://www.theinfatuation.com/austin/guides/the-best-austin-coffee-shops-for-doing-work", "sourceName": "The Infatuation"},
-  {"id": "a4", "region": "Austin", "area": "Airport Blvd / MLK", "name": "Palomino Coffee", "type": "Coffee shop", "setting": "Indoor + patio", "address": "2023 Airport Blvd, Austin, TX 78722", "lat": 30.2839969, "lng": -97.7048332, "vibe": "Zen, plant-filled, Marfa-looking room; the back half is calmer than the buzzy front.", "wifi": "", "hours": "", "url": "https://palominocoffee.com/", "phone": "", "source": "https://www.theinfatuation.com/austin/guides/the-best-austin-coffee-shops-for-doing-work", "sourceName": "The Infatuation"},
-  {"id": "a5", "region": "Austin", "area": "North Loop", "name": "Epoch Coffee – North Loop", "type": "Coffee shop", "setting": "Indoor + patio", "address": "221 W North Loop Blvd, Austin, TX 78751", "lat": 30.3185317, "lng": -97.7245043, "vibe": "Open 24/7; cozy, eclectic room with warm lighting, bookshelves and retractable power cords from the ceiling.", "wifi": "Fast Wi-Fi, ceiling power cords", "hours": "Open 24/7", "url": "https://www.epochcoffee.com/", "phone": "", "source": "https://www.austintexas.org/austin-insider-blog/blog/post/places-to-work-remotely/", "sourceName": "Visit Austin"},
-  {"id": "a6", "region": "Austin", "area": "Tarrytown / Lake Austin", "name": "Mozart's Coffee Roasters", "type": "Coffee shop", "setting": "Indoor + lake deck", "address": "3825 Lake Austin Blvd, Austin, TX 78703", "lat": 30.2954311, "lng": -97.784238, "vibe": "Big deck right on Lake Austin, about 60% patio; bottomless self-serve coffee for long sessions.", "wifi": "Multiple Wi-Fi access points on the deck", "hours": "Daily 7 AM–12 AM", "url": "https://mozartscoffee.com/", "phone": "", "source": "https://www.austintexas.org/austin-insider-blog/blog/post/places-to-work-remotely/", "sourceName": "Visit Austin"},
-  {"id": "a7", "region": "Austin", "area": "Bouldin Creek", "name": "Once Over Coffee Bar", "type": "Coffee shop", "setting": "Indoor + patio", "address": "2009 S 1st St, Austin, TX 78704", "lat": 30.2448093, "lng": -97.7569898, "vibe": "Back patio overlooks what feels like a small forest; calm and peaceful for finishing work.", "wifi": "", "hours": "7 AM–7 PM daily (OSM)", "url": "https://www.onceovercoffeebar.com/", "phone": "", "source": "https://www.theinfatuation.com/austin/guides/the-best-austin-coffee-shops-for-doing-work", "sourceName": "The Infatuation"},
-  {"id": "a8", "region": "Austin", "area": "South Lamar / Manchaca", "name": "Radio Coffee & Beer", "type": "Café + bar", "setting": "Indoor + patio", "address": "4204 Menchaca Rd, Austin, TX 78704", "lat": 30.2315416, "lng": -97.7877719, "vibe": "Wood-covered room that feels like a cozy cabin, with a huge wraparound patio when it fills up.", "wifi": "Wi-Fi and outlets (Work From Austin)", "hours": "7 AM–12 AM daily (Work From Austin)", "url": "https://radiocoffeeandbeer.com/", "phone": "", "source": "https://www.theinfatuation.com/austin/guides/the-best-austin-coffee-shops-for-doing-work", "sourceName": "The Infatuation"},
-  {"id": "a9", "region": "Austin", "area": "Zilker", "name": "Carpenter Coffee Bar (Carpenter Hotel)", "type": "Hotel café", "setting": "Indoor + patio", "address": "400 Josephine St, Austin, TX 78704", "lat": 30.2622705, "lng": -97.758472, "vibe": "Laid-back, beautifully designed hotel coffee bar that welcomes non-guests to settle in and plug in.", "wifi": "Reliable Wi-Fi, ample outlets", "hours": "", "url": "https://www.bunkhousehotels.com/carpenter-hotel/eat-drink/coffee-bar", "phone": "512-682-5300", "source": "https://www.austintexas.org/austin-insider-blog/blog/post/places-to-work-remotely/", "sourceName": "Visit Austin"},
-  {"id": "a10", "region": "Austin", "area": "East Riverside", "name": "Ani's Day & Night", "type": "Café + bar", "setting": "Indoor + patio", "address": "6709 E Riverside Dr, Austin, TX 78741", "lat": 30.2232102, "lng": -97.6996584, "vibe": "Relaxed historic house with outlets inside; the Wi-Fi reaches across a patio with shaded tables.", "wifi": "Wi-Fi reaches the patio", "hours": "Sun–Tue 7 AM–9 PM; Wed–Sat 7 AM–11 PM (OSM)", "url": "https://www.anisdayandnight.com/", "phone": "", "source": "https://www.austintexas.org/austin-insider-blog/blog/post/places-to-work-remotely/", "sourceName": "Visit Austin"},
-  {"id": "a11", "region": "Austin", "area": "East Austin", "name": "Community Garden", "type": "Café + bar", "setting": "Indoor + patio", "address": "1401 Cedar Ave, Unit 2, Austin, TX 78702", "lat": 30.2770995, "lng": -97.713355, "vibe": "Cozy indoor seating and a breezy garden patio; laptops welcome Tue–Fri 8 AM–5 PM only, weekends laptop-free.", "wifi": "Plenty of outlets", "hours": "Laptop hours Tue–Fri 8 AM–5 PM", "url": "https://communitygardenaustin.com/", "phone": "512-330-4878", "source": "https://communitygardenaustin.com/", "sourceName": "Community Garden"},
-  {"id": "a12", "region": "Austin", "area": "Clarksville", "name": "Medici Roasting – West Lynn", "type": "Coffee shop", "setting": "Indoor", "address": "1101 W Lynn St, Austin, TX 78703", "lat": 30.2795139, "lng": -97.7594171, "vibe": "Renovated old house with a very cozy interior and in-house roasted coffee; tables fill early.", "wifi": "", "hours": "Mon–Fri 6 AM–7 PM; Sat–Sun 6:30 AM–7 PM (OSM)", "url": "https://mediciroasting.com/pages/west-lynn", "phone": "", "source": "https://www.theinfatuation.com/austin/guides/the-best-austin-coffee-shops-for-doing-work", "sourceName": "The Infatuation"},
-  {"id": "a13", "region": "Austin", "area": "East MLK", "name": "Bennu Coffee – East MLK", "type": "Coffee shop", "setting": "Indoor", "address": "2001 E Martin Luther King Jr Blvd, Austin, TX 78702", "lat": 30.2797982, "lng": -97.7196272, "vibe": "Big open room of estate-sale tables with an old-school Austin feel, open 24/7; busy when UT is in session.", "wifi": "Power cords from the ceiling", "hours": "Open 24/7", "url": "https://bennucoffee.com/", "phone": "512-478-4700", "source": "https://www.theinfatuation.com/austin/guides/the-best-austin-coffee-shops-for-doing-work", "sourceName": "The Infatuation"},
-  {"id": "a14", "region": "Austin", "area": "South Austin", "name": "Cosmic Coffee + Beer Garden", "type": "Café + bar", "setting": "Outdoor + indoor", "address": "121 Pickle Rd, Austin, TX 78704", "lat": 30.2273202, "lng": -97.7617863, "vibe": "Sprawling garden patio with water features and a chicken coop; room for a whole crew to cowork outdoors.", "wifi": "", "hours": "", "url": "https://cosmichospitalitygroup.com/", "phone": "", "source": "https://www.austintexas.org/austin-insider-blog/blog/post/places-to-work-remotely/", "sourceName": "Visit Austin"},
-  {"id": "a15", "region": "Austin", "area": "South Congress", "name": "The Meteor", "type": "Café + bar", "setting": "Indoor + patio", "address": "2110 S Congress Ave, Austin, TX 78704", "lat": 30.2427776, "lng": -97.7522752, "vibe": "Window seats over South Congress, booths and a covered patio; plugs are easy to find, with some background buzz.", "wifi": "Plugs easy to find", "hours": "Mon–Thu 7 AM–10 PM; Fri–Sat 7 AM–11 PM; Sun 7 AM–10 PM (OSM)", "url": "https://espressochampagnechainlube.com/", "phone": "512-351-9541", "source": "https://www.theinfatuation.com/austin/guides/the-best-austin-coffee-shops-for-doing-work", "sourceName": "The Infatuation"}
-];
-
-const PODS = [
-  {"id": "p1", "region": "Dallas", "area": "Downtown Dallas", "name": "Story Center – Dallas Public Library", "cost": "Free", "rate": "Free with a Dallas Public Library card", "address": "1515 Young St, 3rd floor, Dallas, TX 75201", "lat": 32.7783221, "lng": -96.7949328, "hours": "Library hours: Tue & Thu 9 AM–8 PM; Wed & Fri 9 AM–5 PM; Sat–Sun 9 AM–4 PM; Mon closed", "book": "By appointment: 2-hour sessions, up to 4 hours a day. Orientation and waiver required (online training paused as of Aug 2026; staff train by email or in person).", "contact": "214-670-1668 · libcreativespaces@dallas.gov", "url": "https://www.dallaslibrary.org/services/creative-spaces", "note": "Mackie 8-channel mixer, Audio-Technica AT2020 condenser mics, Zoom H6, iMac with Adobe CC. No food or drink."},
-  {"id": "p2", "region": "Austin", "area": "Downtown Austin", "name": "Innovation Studio (Room 523) – Austin Central Library", "cost": "Free", "rate": "Free with an Austin Public Library card", "address": "710 W Cesar Chavez St, 5th floor, Austin, TX 78701", "lat": 30.2660164, "lng": -97.7517064, "hours": "Tue–Thu 11 AM–7 PM; Fri–Sat 10 AM–4 PM; Sun–Mon closed", "book": "Reserve online for 2 hours, up to 4 people. Same day: text \"Austin Library Innovate\" to 512-898-7734. Walk-ins take empty or forfeited slots.", "contact": "512-974-7442 · apl-innovate@austin.tx.libanswers.com", "url": "https://library.austintexas.gov/makerspace", "note": "Two Mac Pro towers, recording gear and Shure studio mics; consistently booked, so reserve ahead."},
-  {"id": "p3", "region": "Dallas", "area": "Frisco", "name": "Production Studio – Frisco Public Library", "cost": "Free", "rate": "Free (reservation required)", "address": "8000 Dallas Pkwy, Frisco, TX 75034", "lat": 33.143282, "lng": -96.8386882, "hours": "", "book": "Reserve on the Production Studio page. Bring your own SD card or drive; no one-on-one help, but guides are posted.", "contact": "972-292-5669", "url": "https://friscolibrary.com/studio/", "note": "Two Rockville XLR mics, Shure headphones, Focusrite Scarlett 2i2, multitrack recorder."},
-  {"id": "p4", "region": "Dallas", "area": "Garland", "name": "Recording Studio – Garland Central Library", "cost": "Free", "rate": "Free; Garland residents with a Garland library card only", "address": "625 Austin St, Garland, TX 75040", "lat": 32.9144345, "lng": -96.6380739, "hours": "Library: Mon–Thu 9 AM–8 PM; Fri–Sat 10 AM–6 PM; Sun 2–6 PM", "book": "Submit the online request form at least 2 days ahead (up to 2 weeks out); staff call to confirm. 2 hours a day, 2 bookings a week. Online orientation required first.", "contact": "972-205-2000", "url": "https://www.garlandtx.gov/4519/Recording-Studio", "note": "Four Shure SM7dB mics, Focusrite Scarlett 18i8, 3 PTZ 4K cameras."},
-  {"id": "p5", "region": "Dallas", "area": "Richardson", "name": "Studio RPL – Richardson Public Library", "cost": "Free", "rate": "Free for residents with a Richardson library card", "address": "900 Civic Center Dr, Richardson, TX 75080", "lat": 32.9596491, "lng": -96.7334729, "hours": "", "book": "By appointment through the library's Book a Librarian form; open-lab drop-in times are posted on the city calendar.", "contact": "", "url": "https://richardsontoday.com/studio-rpl-helps-residents-produce-creative-content/", "note": "Soundproofed A/V room with a mic, green screen and lights. Details come from a 2019 article; call to confirm before you go."},
-  {"id": "p6", "region": "Dallas", "area": "Plano", "name": "Digital Creation Space – Harrington Library (Plano)", "cost": "Free", "rate": "Free with a Plano library card", "address": "1501 18th St, Plano, TX 75074", "lat": 33.0239336, "lng": -96.6931962, "hours": "", "book": "Reserve on the City of Plano room reservations page under Digital Creation Spaces (also offered at other Plano branches).", "contact": "972-941-7175", "url": "https://www.plano.gov/room-reservations", "note": "Shure SM57/SM58 and Blue Yeti mics, Focusrite Scarlett 2i2, Adobe Audition."},
-  {"id": "p7", "region": "Dallas", "area": "Irving", "name": "The Green Room – Valley Ranch Library (Irving)", "cost": "Free", "rate": "Free with an Irving library card", "address": "401 Cimarron Trail, Irving, TX 75063", "lat": 32.933009, "lng": -96.9522796, "hours": "Mon–Thu 10 AM–8:30 PM; Fri–Sat 10 AM–5:30 PM (from library brochure)", "book": "Reserve on Irving Public Library LibCal (Valley Ranch). Ages 12–21 get priority at certain times.", "contact": "", "url": "https://irvinglibrary.libcal.com/spaces", "note": "Two Yeti mics, a boom mic and headphones; mainly a video/media lab, so it is not a sealed booth."},
-  {"id": "p8", "region": "Fort Worth", "area": "Near Southeast FW", "name": "Studio 600 – Accelerate Fort Worth", "cost": "Paid", "rate": "DIY $25/hr or $175/day; podcast with technician $175 (1.5 hr)", "address": "1150 S Freeway, Bldg 600, Fort Worth, TX 76104", "lat": 32.7324157, "lng": -97.3216513, "hours": "Technician help Mon, Wed, Fri", "book": "Call or email to book.", "contact": "817-201-7019 · info@acceleratefortworth.org", "url": "https://www.acceleratefortworth.org/podcasting/", "note": "RodeCaster Pro II with 4 Rode PodMics. For DIY you bring your own computer and cameras."},
-  {"id": "p9", "region": "Fort Worth", "area": "Downtown FW", "name": "Room To Speak Studios", "cost": "Paid", "rate": "$95 for 1 hr; $140 for 90 min; $165 for 2 hr (producer included)", "address": "600 W 6th St, 4th floor, Room 475, Fort Worth, TX 76102", "lat": 32.7514302, "lng": -97.3342469, "hours": "Mon–Sat 9 AM–8 PM; Sun 1–8 PM", "book": "Book on the website.", "contact": "817-776-9260", "url": "https://roomtospeakstudios.com/", "note": "On-site producer, 2 camera angles and lighting; raw audio and video delivered via Dropbox."},
-  {"id": "p10", "region": "Fort Worth", "area": "Near West Side", "name": "BLANC cowork + studio", "cost": "Paid", "rate": "DIY $125/hr (2-hr minimum); full service $225/hr", "address": "2212 W Peter Smith St, Fort Worth, TX 76102", "lat": 32.7405483, "lng": -97.3499337, "hours": "Office Mon–Fri 9 AM–6 PM; appointment required", "book": "Book online; for under 48 hours' notice, call or text.", "contact": "817-888-8315 · howdy@blancfw.com", "url": "https://blancdfw.com/podcast", "note": "Three video podcast sets with RodeCaster Pro and MXL broadcast mics."},
-  {"id": "p11", "region": "Dallas", "area": "Design District", "name": "CREATRVERSE – Podcast B", "cost": "Paid", "rate": "From $45/hr (the page also shows a $90/hr tier)", "address": "121 Payne St, Dallas, TX 75207", "lat": 32.7850052, "lng": -96.8198207, "hours": "", "book": "Book on the website.", "contact": "", "url": "https://www.creatrverse.com/podcastroomb", "note": "400 sq ft room with theater seating; free coffee and tea bar. Call to confirm which rate covers audio only."},
-  {"id": "p12", "region": "Dallas", "area": "Love Field / Mockingbird", "name": "mzStudios", "cost": "Paid", "rate": "Audio-only $60/hr (2-hr minimum, engineer included)", "address": "1111 W Mockingbird Ln #660, Dallas, TX 75247", "lat": 32.8179405, "lng": -96.8706377, "hours": "Mon–Sat 8 AM–11 PM by appointment; Sun closed", "book": "Book online.", "contact": "214-504-1461 · info@mzstudiosdallas.com", "url": "https://mzstudiosdallas.com/ourservices/", "note": "Broadcast-quality audio with same-day file delivery; supports call-in guests."},
-  {"id": "p13", "region": "Dallas", "area": "Deep Ellum / Main St", "name": "1STOP Podcast", "cost": "Paid", "rate": "$120/hr with technician; $160/hr fully produced", "address": "4311 Main St, Dallas, TX 75226", "lat": 32.790174, "lng": -96.7689876, "hours": "Daily 9 AM–10 PM (site lists most days)", "book": "Book online.", "contact": "903-224-6116", "url": "https://1stoppodcast.com/podcasting", "note": "Three 4K cameras, Shure mics, RodeCaster Pro II, 1-gig Wi-Fi."},
-  {"id": "p14", "region": "Austin", "area": "South Austin", "name": "Space ATX – Creator's Studio 25", "cost": "Paid", "rate": "$35/hr (2-hr minimum); $30/hr students; Studio 31 $50/hr", "address": "7915 Menchaca Rd, Austin, TX 78745", "lat": 30.1927199, "lng": -97.8119717, "hours": "Mon–Thu 12 PM–12 AM; Fri 12–11 PM; Sat–Sun 11 AM–11 PM", "book": "Call or email to schedule.", "contact": "512-448-9518 · studio@spaceatx.com", "url": "https://spaceatx.com/video/", "note": "A production suite for freelancers; in-house staff are available, or bring your own crew."},
-  {"id": "p15", "region": "Austin", "area": "East Austin", "name": "Austin Public (AFS Producer Program)", "cost": "Paid", "rate": "$15/month or $150/year, plus a $15 Media Policy class that includes your first month", "address": "1143 Northwestern Ave, Austin, TX 78702", "lat": 30.2694223, "lng": -97.7162478, "hours": "Mon–Thu 2–10 PM; Sun 11 AM–7 PM; closed Fri–Sat", "book": "Fill out the intake form, take the Media Policy class and the gear certification classes, then reserve studios in the Producer Portal. Austin-area residents 15+; scholarships available.", "contact": "512-322-0145 · austinpublic@austinfilm.org", "url": "https://www.austinfilm.org/austin-public/producer-program-orientation/", "note": "The city's public-access media studio: studios, audio gear and edit space."}
-];
-
+const CHECKED = "Nov 13, 2026";
 const CAVEATS = [
-  "Rates are as shown on each studio's site on Nov 12, 2026; call to confirm before you book.",
-  "CREATRVERSE lists two prices ($45 and $90 an hour) without saying which is audio only.",
-  "Studio RPL in Richardson is described in a 2019 article; confirm it still takes bookings.",
-  "Fort Worth Public Library has no recording studio, and its downtown Central Library is closed until the new building opens. Fort Worth's podcast layer is paid only.",
-  "Library studios need that city's library card and a booking; Garland's studio is for Garland residents only.",
-  "Half Price Books blocks automated checks, so its store link was confirmed through search listings.",
-  "Community Garden in Austin allows laptops only Tue–Fri 8 AM–5 PM.",
-  "The Library branches overlay is raw OpenStreetMap data (amenity=library) and was not individually verified like the curated spots."
+  {r:"", t:"Rates and hours are as shown on each place's site when checked; call to confirm before you go or book."},
+  {r:"dallas", t:"CREATRVERSE lists two prices ($45 and $90 an hour) without saying which is audio only."},
+  {r:"dallas", t:"Studio RPL in Richardson is described in a 2019 article; confirm it still takes bookings."},
+  {r:"dallas", t:"Library studios need that city's library card and a booking; Garland's studio is for Garland residents only."},
+  {r:"dallas", t:"Half Price Books blocks automated checks, so its store link was confirmed through search listings."},
+  {r:"fort-worth", t:"Fort Worth Public Library has no recording studio, and its downtown Central Library is closed until the new building opens. Fort Worth's podcast layer is paid only."},
+  {r:"austin", t:"Community Garden in Austin allows laptops only Tue–Fri 8 AM–5 PM."},
+  {r:"san-diego", t:"The two free San Diego studios are teen-focused IDEA Labs: adults book by phone (Valencia Park) or use public open hours (City Heights)."},
+  {r:"san-diego", t:"Westcoast Radio Studios' rate and hours come from its Tagvenue listing."},
+  {r:"okc", t:"The Almonte Podcast Room is the only podcast room in the Metropolitan Library System; it needs a Metro library card and the MLS Studios user agreement."},
+  {r:"okc", t:"Belle Isle Library is closed for rebuilding (temporary site at 3621 NW Expressway), so it isn't listed."},
+  {r:"okc", t:"Sovereign Row's podcast studio publishes rates but no street address, so it isn't mapped."},
+  {r:"edmond", t:"No podcast studio with a public address was found in Edmond; the nearest free room is the Almonte Library Podcast Room in south OKC."},
+  {r:"guthrie", t:"Only two Guthrie spots could be verified (Hoboken and the library). No podcast studio found."},
+  {r:"tupelo", t:"Only three Tupelo spots could be verified; Just Love Coffee was left off because its address couldn't be placed precisely. No podcast studio found."},
+  {r:"santa-fe", t:"No free library studio in Santa Fe. Fw Studios records podcasts for $40/hr ((505) 730-2468, info@fw-studios.com) but publishes no street address, so it isn't mapped."},
+  {r:"santa-fe", t:"Iconik's own website was down when checked, so its links go to the Iconik shop site."},
+  {r:"santa-fe", t:"Remix Audio Bar's daytime work sessions must be reserved and run on select days only."},
+  {r:"taos", t:"7K Studios is the only Taos podcast space with a published rate. Elevation Coffee's link is the Taos.org guide (its own site wasn't reachable)."},
+  {r:"red-river", t:"The Koffee House's map pin is approximate, so its navigation buttons search by name and address instead of coordinates."},
+  {r:"red-river", t:"No podcast studios found in Red River or Angel Fire."},
+  {r:"", t:"The Library branches overlay is raw OpenStreetMap data (amenity=library) and was not individually verified like the curated spots."},
+  {r:"", t:"Favorites and notes are stored only in this browser (localStorage). Use Export to back them up or move them to another device."}
 ];
 </script>
 <style>
+
 :root{
   --bg:#1f2a2e; --panel:rgba(250,248,244,.97); --ink:#22302f; --ink2:#5b6766; --ink3:#8a9493;
   --line:rgba(34,48,47,.12); --work:#2f8f83; --pod:#8b5fbf; --paid:#c9893a; --lib:#5878a8;
@@ -236,6 +186,48 @@ dl.props dd{margin:0;word-break:break-word}
   .leaflet-top.leaflet-right{top:12px}
   .leaflet-left{left:400px}
 }
+
+/* v2 additions */
+.tab{font-size:13.5px;gap:6px;padding:0 6px}
+.tab .heart{width:14px;height:14px;fill:#d0566b}
+.fav{flex:none;width:40px;height:40px;margin:-6px -4px 0 0;border:0;background:none;display:grid;place-items:center;cursor:pointer;border-radius:12px}
+.fav svg{width:22px;height:22px;fill:none;stroke:var(--ink3);stroke-width:2}
+.fav.on svg{fill:#d0566b;stroke:#d0566b}
+.item .r{display:flex;flex-direction:column;align-items:flex-end;margin-left:auto;flex:none}
+.item .d{margin-left:0}
+.item .nt{font-size:12.5px;color:#7a4f17;background:#f8efe0;border-radius:8px;padding:3px 7px;margin-top:5px;display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dhead{display:flex;gap:8px;align-items:flex-start}
+.dhead h2{flex:1}
+.dhead .fav{width:46px;height:46px;background:var(--chip);margin:0}
+.dhead .fav svg{width:24px;height:24px}
+.navrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 4px}
+.navbtn{display:flex;align-items:center;justify-content:center;gap:6px;min-height:50px;border-radius:14px;text-decoration:none;font-weight:700;font-size:13.5px;color:#fff}
+.navbtn.g{background:#1a73e8}.navbtn.w{background:#33ccff;color:#06283d}.navbtn.a{background:#22302f}
+.navbtn svg{width:18px;height:18px;fill:currentColor}
+.navhint{font-size:11.5px;color:var(--ink3);margin:0 0 6px}
+.mynote{margin:14px 0;background:#fbf6ec;border:1px solid #efe2c8;border-radius:14px;padding:10px 12px}
+.mynote label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9a6420;display:flex;justify-content:space-between}
+.mynote textarea{width:100%;min-height:76px;border:0;background:transparent;resize:vertical;font:inherit;font-size:15px;line-height:1.45;outline:none;padding:6px 0 0;color:var(--ink)}
+.mynote .st{font-size:11px;color:var(--ink3);letter-spacing:0;text-transform:none}
+.sharerow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0 2px}
+.sharebtn{border:0;height:44px;padding:0 16px;border-radius:12px;background:var(--ink);color:#fff;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px}
+.sharebtn svg{width:18px;height:18px;fill:currentColor}
+.sharerow label{font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:6px}
+.sharerow input{width:18px;height:18px;accent-color:var(--ink)}
+.savedbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px 4px;border-bottom:1px solid var(--line)}
+.savedbar button,.savedbar label{border:0;height:40px;padding:0 14px;border-radius:12px;background:var(--chip);font-weight:700;font-size:13.5px;cursor:pointer;display:flex;align-items:center}
+.savedbar .hint{flex-basis:100%;font-size:12px;color:var(--ink3);font-weight:400;height:auto;padding:0;background:none}
+.loading{padding:14px 8px;color:var(--ink2);font-size:13.5px}
+.rbub{display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);cursor:pointer}
+.rbub b{background:var(--ink);color:#f4efe6;border-radius:16px;padding:6px 11px;font-size:12.5px;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid #fff}
+.rbub span{font-size:11px;color:#22302f;background:rgba(255,255,255,.88);border-radius:8px;padding:1px 6px;margin-top:3px;white-space:nowrap}
+.chip .st{font-weight:500;color:var(--ink3);font-size:12px;margin-left:4px}
+.chip.on .st{color:#cfc8bb}
+.chip.grp{background:#e7efe9}
+.chip.grp.on{background:var(--ink)}
+/* half-open sheet: keep the bottom of the list reachable */
+@media (max-width:899px){#sheet.half #body{padding-bottom:calc(88vh*.46 + 24px);padding-bottom:calc(88dvh*.46 + 24px)}}
+
 </style>
 </head>
 <body>
@@ -249,12 +241,7 @@ dl.props dd{margin:0;word-break:break-word}
     <button class="iconbtn" id="btnFilter" aria-label="Filters" title="Filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></button>
     <button class="iconbtn" id="btnNear" aria-label="Near me" title="Near me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
   </div>
-  <div id="cities">
-    <button class="chip" data-city="All">All</button>
-    <button class="chip" data-city="Dallas">Dallas</button>
-    <button class="chip" data-city="Fort Worth">Fort Worth</button>
-    <button class="chip" data-city="Austin">Austin</button>
-  </div>
+  <div id="cities" role="tablist" aria-label="Regions"></div>
 </div>
 
 <div id="sheet" aria-label="Spots list">
@@ -263,6 +250,7 @@ dl.props dd{margin:0;word-break:break-word}
     <div id="tabs">
       <button class="tab on" data-tab="work"><span class="dot" style="background:var(--work)"></span>Work <span id="cWork"></span></button>
       <button class="tab" data-tab="pod"><span class="dot" style="background:var(--pod)"></span>Podcast <span id="cPod"></span></button>
+      <button class="tab" data-tab="saved"><svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.1 5.2 3 1.6-1.9 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>Saved <span id="cSaved"></span></button>
     </div>
     <div id="summary"></div>
     <div id="credit">Presented by <b>Chambers Creations, LLC</b></div>
@@ -278,6 +266,7 @@ dl.props dd{margin:0;word-break:break-word}
     <div id="detail"></div>
   </div>
 </div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
 <div id="help" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
   <div class="card">
     <button class="close" id="helpClose" aria-label="Close">×</button>
@@ -285,168 +274,43 @@ dl.props dd{margin:0;word-break:break-word}
     <div class="by">Presented by Chambers Creations, LLC</div>
     <h3>Get around</h3>
     <ul>
-      <li><span class="k">🏙</span><span><b>City chips</b> (All, Dallas, Fort Worth, Austin) jump the map to that city and filter the list.</span></li>
-      <li><span class="k">🔎</span><span><b>Search</b> looks through names, neighborhoods, vibe notes, rates and booking notes.</span></li>
+      <li><span class="k">🏙</span><span><b>Region chips</b> scroll sideways: Dallas, Fort Worth, Austin, OKC, Edmond, Guthrie, Tupelo, Northern NM (Santa Fe, Taos, Red River and Angel Fire together), each NM town, San Diego, and All. Tap one to jump there; its spots load only then, so the app stays fast.</span></li>
+      <li><span class="k">🗺</span><span><b>Pan or zoom</b> into a region and its spots load automatically. Zoomed out, dark bubbles mark each region with its spot count; tap one to go there.</span></li>
+      <li><span class="k">🔎</span><span><b>Search</b> looks through names, neighborhoods, vibe notes, rates, booking notes <b>and your own notes</b>, across every region.</span></li>
       <li><span class="k">☰</span><span><b>Filters</b>: work spot type, free or paid podcast spaces, and outdoor seating only. “Reset all” clears them.</span></li>
-      <li><span class="k">◎</span><span><b>Near me</b> uses your phone's location, drops a blue dot and sorts both lists by distance.</span></li>
-      <li><span class="k">↕</span><span><b>Bottom panel</b>: swipe it up or down, or tap the handle, to switch between peek, half and full. Tap the map to tuck it away. Switch between the Work and Podcast tabs.</span></li>
-      <li><span class="k">📍</span><span><b>Tap a pin or a list row</b> for details: the vibe note and its source, hours, Wi-Fi notes, and big buttons for Directions (Google Maps), Call, Email and Website.</span></li>
+      <li><span class="k">◎</span><span><b>Near me</b> uses your location, jumps to the nearest WNDR region and sorts the lists by distance. If you've already allowed location, WNDR opens on your nearest region; otherwise it opens on Dallas.</span></li>
+      <li><span class="k">↕</span><span><b>Bottom panel</b>: swipe it up or down, or tap the handle. Tabs: Work, Podcast and Saved.</span></li>
+      <li><span class="k">📍</span><span><b>Tap a pin or a list row</b> for details: the vibe note and its source, hours, Wi-Fi, and buttons for Call, Email and Website.</span></li>
+    </ul>
+    <h3>Directions</h3>
+    <ul>
+      <li><span class="k">🧭</span><span>Every spot has <b>Google Maps</b>, <b>Waze</b> and <b>Apple Maps</b> buttons that start navigation to the spot's exact coordinates. Where a pin is only approximate, the buttons search by name and address instead.</span></li>
+    </ul>
+    <h3>Save spots and keep notes</h3>
+    <ul>
+      <li><span class="k">♥</span><span><b>Heart</b> a spot on its list row or details page to save it. The <b>Saved</b> tab lists your hearts and any spot you've written a note on.</span></li>
+      <li><span class="k">✎</span><span><b>My note</b> on each details page is private and saves as you type, e.g. “best table by the window” or “Wi-Fi drops after 3”. Notes show on the details page and in the list, and search finds them.</span></li>
+      <li><span class="k">⤴</span><span><b>Share spot</b> opens your phone's share menu (or copies a link) that opens WNDR right on that spot. Tick “Include my note” to add your note to the message.</span></li>
+      <li><span class="k">⇅</span><span><b>Export / Import</b> in the Saved tab saves your hearts and notes as a file, so you can back them up or move them to another phone or browser.</span></li>
+      <li><span class="k">🔒</span><span>Everything stays <b>on this device</b>: there are no accounts and no public notes. Clearing your browser data clears them, so export now and then.</span></li>
     </ul>
     <h3>Layers (stack button, top right)</h3>
     <ul>
       <li><span class="k"><span class="sw" style="background:var(--work);margin:0"></span></span><span><b>Work spots</b>: calm cafés, bookstores, libraries, hotel lobbies and patios good for a laptop or a private talk.</span></li>
       <li><span class="k"><span class="sw" style="background:var(--pod);margin:0"></span></span><span><b>Podcast spaces</b>: a filled purple mic pin is <b>free</b> (mostly library studios); a white pin with a purple ring is <b>paid</b>.</span></li>
-      <li><span class="k"><span class="sw" style="background:#f0b26b;margin:0"></span></span><span><b>Chill zones</b>: a soft amber glow around each spot; the deeper the glow, the more good spots are clustered there.</span></li>
-      <li><span class="k"><span class="sw" style="background:#3f6e8c;margin:0"></span></span><span><b>City boundaries</b>: dashed outlines of Dallas, Fort Worth, Austin and nearby cities from OpenStreetMap.</span></li>
-      <li><span class="k"><span class="sw" style="background:#5fb07c;margin:0"></span></span><span><b>5-mile rings</b>: green rings show what's within 5 miles of a free studio; dashed amber rings do the same for paid studios.</span></li>
-      <li><span class="k"><span class="sw" style="background:#5878a8;margin:0"></span></span><span><b>Library branches</b>: public and campus libraries from OpenStreetMap, not individually checked like the main spots.</span></li>
+      <li><span class="k"><span class="sw" style="background:#f0b26b;margin:0"></span></span><span><b>Chill zones</b>: a soft amber glow; the deeper the glow, the more good spots are clustered there.</span></li>
+      <li><span class="k"><span class="sw" style="background:#3f6e8c;margin:0"></span></span><span><b>City boundaries</b>: dashed outlines from OpenStreetMap.</span></li>
+      <li><span class="k"><span class="sw" style="background:#5fb07c;margin:0"></span></span><span><b>5-mile rings</b>: green around free studios; dashed amber around paid ones.</span></li>
+      <li><span class="k"><span class="sw" style="background:#5878a8;margin:0"></span></span><span><b>Library branches</b>: public libraries from OpenStreetMap, not individually checked like the main spots.</span></li>
       <li><span class="k">🗺</span><span><b>Basemaps</b>: OpenStreetMap (default), Calm (muted), Night (dimmed) and Humanitarian.</span></li>
     </ul>
     <h3>Keep it on your phone</h3>
     <p>In Chrome on Android, tap the ⋮ menu, then <b>Add to Home screen</b>. On iPhone Safari, tap Share, then <b>Add to Home Screen</b>. WNDR then opens like an app (it needs a connection for the map).</p>
-    <div class="warn"><b>Call ahead.</b> Hours and studio rates were checked from each place's site on Nov 12, 2026 and can change. Confirm by phone before you head out or book a session.</div>
+    <div class="warn"><b>Call ahead.</b> Hours and studio rates were checked from each place's site (DFW and Austin on Nov 12, 2026; the new cities on Nov 13, 2026) and can change. Confirm by phone before you head out or book a session.</div>
   </div>
 </div>
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
-<script>
-/* Extra overlay data fetched Nov 12, 2026 from OpenStreetMap (Nominatim). Kept below the main data. */
-const BOUNDARIES = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"Dallas","osm":"relation/6571629"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-97.0005,32.6222],[-96.9928,32.6135],[-96.9938,32.617],[-96.9888,32.6188],[-96.9916,32.6191],[-96.9927,32.6247],[-96.9864,32.6268],[-96.9828,32.6241],[-96.9823,32.6244],[-96.9847,32.6299],[-96.9822,32.6314],[-96.9841,32.6321],[-96.9807,32.632],[-96.9808,32.6384],[-96.9777,32.6394],[-96.972,32.6372],[-96.9758,32.6221],[-96.9576,32.6327],[-96.9532,32.6327],[-96.953,32.6263],[-96.949,32.6205],[-96.9455,32.6201],[-96.9426,32.6229],[-96.9432,32.6622],[-96.9258,32.6623],[-96.9258,32.6766],[-96.8928,32.6765],[-96.8912,32.6475],[-96.8799,32.6476],[-96.8784,32.643],[-96.8744,32.6429],[-96.8744,32.6362],[-96.8656,32.6361],[-96.8657,32.6331],[-96.8232,32.6332],[-96.8231,32.6411],[-96.8144,32.6421],[-96.8144,32.6477],[-96.7881,32.6497],[-96.7881,32.6454],[-96.7836,32.6385],[-96.7774,32.6415],[-96.7663,32.6189],[-96.74,32.6188],[-96.7401,32.6257],[-96.7318,32.6296],[-96.7293,32.6362],[-96.7325,32.6411],[-96.7294,32.6426],[-96.7319,32.6465],[-96.7238,32.6505],[-96.7295,32.6588],[-96.7218,32.6617],[-96.726,32.6708],[-96.7243,32.6717],[-96.7183,32.6694],[-96.6991,32.6805],[-96.6937,32.6806],[-96.6953,32.6773],[-96.6912,32.6718],[-96.6779,32.6763],[-96.6765,32.6749],[-96.6787,32.6683],[-96.6719,32.6683],[-96.6691,32.6658],[-96.67,32.6589],[-96.6558,32.6485],[-96.6611,32.644],[-96.6524,32.6406],[-96.6553,32.637],[-96.6513,32.6395],[-96.6447,32.6365],[-96.6222,32.6551],[-96.6191,32.6531],[-96.6204,32.6485],[-96.616,32.6493],[-96.6142,32.651],[-96.6171,32.6606],[-96.6108,32.6655],[-96.6065,32.6618],[-96.6029,32.6644],[-96.5892,32.6565],[-96.5924,32.6539],[-96.5858,32.6479],[-96.5822,32.6526],[-96.5946,32.6611],[-96.5912,32.6674],[-96.5981,32.6706],[-96.5957,32.6727],[-96.5887,32.6694],[-96.5753,32.6785],[-96.5747,32.6811],[-96.5628,32.6812],[-96.5565,32.6873],[-96.5587,32.6891],[-96.5552,32.692],[-96.5631,32.7012],[-96.5809,32.7038],[-96.6142,32.7011],[-96.6143,32.6963],[-96.6224,32.6953],[-96.6229,32.6904],[-96.6303,32.6904],[-96.6375,32.694],[-96.6356,32.704],[-96.6386,32.705],[-96.6391,32.7557],[-96.6442,32.7633],[-96.6675,32.7825],[-96.6705,32.7826],[-96.6731,32.7916],[-96.6849,32.7923],[-96.6814,32.7974],[-96.674,32.7986],[-96.6738,32.807],[-96.6652,32.8071],[-96.6652,32.8155],[-96.6622,32.8155],[-96.6616,32.8213],[-96.6581,32.8213],[-96.6582,32.8308],[-96.6605,32.8309],[-96.6605,32.8347],[-96.6552,32.8376],[-96.6526,32.8354],[-96.6483,32.8389],[-96.6398,32.8396],[-96.6359,32.8444],[-96.6514,32.8571],[-96.69,32.8788],[-96.6832,32.8789],[-96.6832,32.886],[-96.6905,32.886],[-96.6904,32.8903],[-96.6937,32.8903],[-96.6917,32.9041],[-96.6975,32.9026],[-96.6976,32.9092],[-96.7006,32.9092],[-96.7005,32.9165],[-96.7057,32.9166],[-96.7057,32.9312],[-96.7182,32.9313],[-96.7182,32.9254],[-96.7487,32.9233],[-96.7415,32.9347],[-96.7485,32.9341],[-96.7483,32.9399],[-96.7691,32.9398],[-96.7683,32.9829],[-96.7575,32.9829],[-96.7551,32.9971],[-96.7564,33.001],[-96.7724,33.0009],[-96.7944,33.0131],[-96.8435,33.0165],[-96.8438,33.0113],[-96.866,33.0118],[-96.866,33.0025],[-96.8716,33.0019],[-96.875,32.9898],[-96.8548,32.9897],[-96.8549,32.9871],[-96.8288,32.9872],[-96.8286,32.9797],[-96.8218,32.973],[-96.8226,32.954],[-96.8081,32.954],[-96.8078,32.9506],[-96.8099,32.9454],[-96.815,32.9454],[-96.8181,32.9501],[-96.8236,32.9502],[-96.8215,32.9281],[-96.8232,32.9267],[-96.8388,32.9257],[-96.859,32.9169],[-96.8909,32.9091],[-96.8914,32.9156],[-96.905,32.9133],[-96.9047,32.9117],[-96.9082,32.9118],[-96.9109,32.8959],[-96.9273,32.8957],[-96.9207,32.9],[-96.9264,32.9],[-96.9265,32.9048],[-96.9312,32.9075],[-96.9307,32.9107],[-96.9333,32.9126],[-96.9379,32.9144],[-96.9373,32.9171],[-96.938,32.9215],[-96.9355,32.9247],[-96.9368,32.9272],[-96.9343,32.9272],[-96.9329,32.9281],[-96.9328,32.9293],[-96.9396,32.9333],[-96.9377,32.9349],[-96.9357,32.9345],[-96.9343,32.9354],[-96.9322,32.9412],[-96.9348,32.9472],[-96.9385,32.9488],[-96.938,32.9517],[-96.9431,32.9583],[-96.9438,32.9651],[-96.9399,32.9651],[-96.942,32.9686],[-96.945,32.9665],[-96.9437,32.9578],[-96.939,32.9525],[-96.9394,32.9489],[-96.934,32.9448],[-96.9327,32.9412],[-96.9347,32.9385],[-96.9413,32.9393],[-96.9418,32.9451],[-96.9426,32.9467],[-96.9444,32.9486],[-96.9545,32.9507],[-96.9597,32.9507],[-96.9619,32.9496],[-96.9672,32.9541],[-96.9727,32.9558],[-96.9916,32.9478],[-96.9916,32.9443],[-96.9935,32.9443],[-96.9936,32.9313],[-96.9914,32.9312],[-96.9914,32.9257],[-96.9679,32.9253],[-96.9676,32.9475],[-96.9701,32.9494],[-96.9682,32.954],[-96.9618,32.9491],[-96.9556,32.9505],[-96.9433,32.9471],[-96.9413,32.9386],[-96.9352,32.937],[-96.9353,32.9349],[-96.9389,32.9352],[-96.9403,32.9322],[-96.933,32.9291],[-96.9374,32.9277],[-96.9359,32.925],[-96.9385,32.9224],[-96.9384,32.9137],[-96.9323,32.9116],[-96.9317,32.9071],[-96.9268,32.9026],[-96.9286,32.8965],[-96.9272,32.8919],[-96.931,32.8907],[-96.9301,32.8873],[-96.9323,32.8845],[-96.9282,32.8827],[-96.9315,32.8713],[-96.9274,32.8693],[-96.9252,32.8709],[-96.9269,32.866],[-96.9242,32.8657],[-96.9253,32.8633],[-96.9222,32.8617],[-96.9252,32.8588],[-96.9169,32.8585],[-96.9161,32.8518],[-96.8997,32.8515],[-96.8938,32.8473],[-96.8888,32.8473],[-96.8898,32.8427],[-96.8919,32.8426],[-96.8913,32.8379],[-96.8897,32.8403],[-96.89,32.8311],[-96.9054,32.8169],[-96.9061,32.8094],[-96.9088,32.8095],[-96.8983,32.7982],[-96.9075,32.7969],[-96.9134,32.7848],[-96.9187,32.7857],[-96.9261,32.7822],[-96.928,32.7644],[-96.924,32.7611],[-96.9273,32.7448],[-96.9311,32.7426],[-96.9412,32.7435],[-96.9431,32.7387],[-96.9486,32.7388],[-96.9487,32.7367],[-96.9514,32.7389],[-96.958,32.7389],[-96.958,32.7466],[-96.9874,32.7454],[-96.9877,32.7382],[-96.9839,32.7382],[-96.9839,32.7349],[-96.9893,32.7349],[-96.9893,32.7328],[-96.993,32.7349],[-96.994,32.7314],[-96.9895,32.729],[-96.9899,32.7255],[-96.9825,32.7292],[-96.9814,32.7264],[-96.9772,32.7263],[-96.9772,32.717],[-96.981,32.714],[-96.9812,32.7104],[-96.979,32.7103],[-96.98,32.7059],[-96.9853,32.704],[-96.9852,32.6944],[-96.9911,32.6945],[-96.9912,32.6875],[-96.9851,32.6875],[-96.9832,32.6733],[-96.9884,32.6683],[-96.989,32.6617],[-96.995,32.6588],[-96.9881,32.6467],[-96.9903,32.6425],[-96.9955,32.6397],[-96.9961,32.63],[-97.0005,32.6222]],[[-96.8985,32.7342],[-96.8938,32.735],[-96.8956,32.7464],[-96.8914,32.7465],[-96.8914,32.7423],[-96.8784,32.7406],[-96.8797,32.735],[-96.8877,32.735],[-96.8878,32.7317],[-96.8985,32.7342]],[[-96.8192,32.8367],[-96.8149,32.8366],[-96.8123,32.8579],[-96.8086,32.8579],[-96.8086,32.8604],[-96.8041,32.8598],[-96.8041,32.8655],[-96.7831,32.8653],[-96.783,32.8599],[-96.7767,32.8576],[-96.777,32.8555],[-96.7731,32.8555],[-96.7734,32.8516],[-96.777,32.8511],[-96.772,32.8505],[-96.7738,32.8457],[-96.7711,32.8437],[-96.7748,32.8438],[-96.7811,32.8366],[-96.7809,32.8328],[-96.793,32.8222],[-96.7982,32.8232],[-96.7992,32.8189],[-96.8044,32.8232],[-96.812,32.8232],[-96.8147,32.8198],[-96.8186,32.8231],[-96.8192,32.8367]]],[[[-96.5972,32.8908],[-96.5926,32.885],[-96.5952,32.8839],[-96.5925,32.8827],[-96.5915,32.8781],[-96.5801,32.8671],[-96.5743,32.8658],[-96.5713,32.8684],[-96.5654,32.8631],[-96.5536,32.862],[-96.5469,32.8677],[-96.5379,32.8682],[-96.5371,32.8665],[-96.54,32.8639],[-96.5396,32.858],[-96.5476,32.8579],[-96.5451,32.8468],[-96.5496,32.8489],[-96.5564,32.8466],[-96.5566,32.8398],[-96.5604,32.8398],[-96.5597,32.8337],[-96.5608,32.8336],[-96.5645,32.8301],[-96.5663,32.8343],[-96.5956,32.8332],[-96.5869,32.8314],[-96.5721,32.8332],[-96.5668,32.8292],[-96.5645,32.83],[-96.5606,32.8336],[-96.5434,32.8336],[-96.5434,32.8292],[-96.5389,32.828],[-96.5436,32.8237],[-96.5426,32.8203],[-96.5329,32.8134],[-96.5352,32.8087],[-96.5322,32.7981],[-96.5193,32.796],[-96.5193,32.7896],[-96.5063,32.7897],[-96.5057,32.7856],[-96.5,32.7808],[-96.5037,32.7778],[-96.5031,32.774],[-96.4965,32.772],[-96.4977,32.7831],[-96.49,32.7983],[-96.491,32.8058],[-96.4928,32.8058],[-96.4894,32.81],[-96.4839,32.8092],[-96.488,32.8116],[-96.4868,32.8141],[-96.4894,32.8116],[-96.4915,32.8174],[-96.4979,32.8207],[-96.4911,32.8229],[-96.4903,32.8242],[-96.4961,32.8251],[-96.4988,32.8224],[-96.5034,32.8283],[-96.4968,32.8348],[-96.4942,32.8346],[-96.4957,32.8357],[-96.4944,32.8376],[-96.4936,32.8371],[-96.4933,32.8373],[-96.4933,32.8375],[-96.4944,32.8379],[-96.5009,32.8326],[-96.5049,32.8317],[-96.5061,32.8367],[-96.5074,32.8338],[-96.5085,32.8349],[-96.5054,32.8409],[-96.4966,32.8431],[-96.4968,32.8486],[-96.4907,32.851],[-96.4873,32.8498],[-96.4914,32.8549],[-96.4798,32.87],[-96.4818,32.8754],[-96.4873,32.8795],[-96.4815,32.8912],[-96.4823,32.8927],[-96.4892,32.8904],[-96.4821,32.8939],[-96.4819,32.9003],[-96.4761,32.9018],[-96.4686,32.9095],[-96.4683,32.9077],[-96.4669,32.9127],[-96.4731,32.9283],[-96.4919,32.9245],[-96.4738,32.9292],[-96.4792,32.9325],[-96.4885,32.9466],[-96.4953,32.9459],[-96.4931,32.9499],[-96.4902,32.949],[-96.4914,32.9517],[-96.4886,32.9537],[-96.4848,32.953],[-96.4863,32.9554],[-96.4795,32.9607],[-96.4809,32.9643],[-96.4783,32.9708],[-96.4749,32.9708],[-96.4748,32.9744],[-96.4638,32.9793],[-96.4637,32.9825],[-96.4669,32.9826],[-96.4669,32.9861],[-96.4808,32.9854],[-96.4811,32.9863],[-96.4665,32.9984],[-96.4682,32.9997],[-96.4652,33.0057],[-96.4668,33.0087],[-96.4642,33.0122],[-96.4649,33.0199],[-96.4852,33.0233],[-96.4855,33.0152],[-96.4902,33.0139],[-96.4909,33.0073],[-96.4964,33.0049],[-96.4982,32.9987],[-96.4967,32.9896],[-96.5014,32.9874],[-96.5036,32.9907],[-96.5064,32.9907],[-96.5061,32.9737],[-96.5094,32.9647],[-96.516,32.9592],[-96.5157,32.952],[-96.5216,32.9596],[-96.5174,32.9451],[-96.5216,32.9392],[-96.5163,32.938],[-96.5157,32.9298],[-96.5088,32.9231],[-96.5059,32.9234],[-96.5018,32.9143],[-96.5053,32.9096],[-96.5098,32.9082],[-96.5092,32.9048],[-96.5138,32.9007],[-96.5123,32.8984],[-96.5144,32.8948],[-96.5178,32.8955],[-96.5152,32.8933],[-96.5177,32.8893],[-96.5154,32.8839],[-96.5183,32.8795],[-96.5257,32.8822],[-96.539,32.8806],[-96.5405,32.8827],[-96.5412,32.8889],[-96.5369,32.8913],[-96.5403,32.8918],[-96.537,32.8918],[-96.5343,32.9032],[-96.5384,32.9049],[-96.5405,32.9138],[-96.5389,32.9209],[-96.542,32.9209],[-96.5417,32.9306],[-96.5444,32.9292],[-96.5435,32.9203],[-96.5474,32.9171],[-96.5483,32.9106],[-96.546,32.9071],[-96.5479,32.9061],[-96.5383,32.8947],[-96.5436,32.8991],[-96.5488,32.8919],[-96.5408,32.8916],[-96.5494,32.8912],[-96.5501,32.8798],[-96.5479,32.8762],[-96.5536,32.8747],[-96.5593,32.8813],[-96.5616,32.8734],[-96.5695,32.8745],[-96.5713,32.8699],[-96.5698,32.8754],[-96.5791,32.8798],[-96.579,32.8857],[-96.5862,32.8895],[-96.5893,32.8952],[-96.5906,32.8996],[-96.5887,32.9042],[-96.5929,32.9079],[-96.5931,32.9138],[-96.5934,32.9081],[-96.5924,32.8939],[-96.589,32.8845],[-96.5944,32.8884],[-96.595,32.8935],[-96.5972,32.8908]]]]}},{"type":"Feature","properties":{"name":"Fort Worth","osm":"relation/115274"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-97.3552,32.607],[-97.3552,32.6046],[-97.3511,32.6046],[-97.3509,32.6001],[-97.3343,32.5999],[-97.3346,32.5718],[-97.3247,32.5718],[-97.3238,32.5693],[-97.3184,32.5693],[-97.3178,32.5633],[-97.314,32.5631],[-97.3142,32.5526],[-97.2366,32.5516],[-97.241,32.5589],[-97.2408,32.5827],[-97.2329,32.5827],[-97.2325,32.6075],[-97.2337,32.5829],[-97.2415,32.5828],[-97.2418,32.5588],[-97.2375,32.552],[-97.2872,32.5528],[-97.2846,32.5579],[-97.2869,32.5591],[-97.2837,32.5608],[-97.3035,32.5606],[-97.3013,32.5609],[-97.2983,32.5681],[-97.2937,32.5681],[-97.292,32.5739],[-97.2867,32.5739],[-97.2887,32.5697],[-97.2831,32.5697],[-97.2828,32.5777],[-97.2907,32.576],[-97.2906,32.5798],[-97.2929,32.5797],[-97.2927,32.5976],[-97.2839,32.5975],[-97.287,32.6165],[-97.2699,32.6165],[-97.2693,32.6256],[-97.2689,32.6237],[-97.2647,32.6237],[-97.2614,32.6292],[-97.27,32.631],[-97.27,32.6237],[-97.2871,32.6237],[-97.2872,32.6166],[-97.2946,32.6165],[-97.2932,32.6236],[-97.3012,32.6271],[-97.3013,32.631],[-97.2927,32.631],[-97.2927,32.6336],[-97.2887,32.6338],[-97.2862,32.6433],[-97.2801,32.6433],[-97.2802,32.634],[-97.2613,32.6351],[-97.2614,32.6303],[-97.2522,32.6303],[-97.252,32.6456],[-97.2452,32.6436],[-97.244,32.6355],[-97.2358,32.6355],[-97.2354,32.6382],[-97.2409,32.6386],[-97.2408,32.6431],[-97.2341,32.6447],[-97.2341,32.6517],[-97.2429,32.6565],[-97.2511,32.6565],[-97.2528,32.6457],[-97.2779,32.6456],[-97.2779,32.6485],[-97.2849,32.6485],[-97.2808,32.666],[-97.2807,32.6785],[-97.2912,32.6882],[-97.241,32.6653],[-97.2317,32.6678],[-97.2337,32.6716],[-97.2298,32.6772],[-97.23,32.6813],[-97.2338,32.6878],[-97.2335,32.693],[-97.2224,32.6993],[-97.2178,32.6978],[-97.2166,32.701],[-97.2185,32.7037],[-97.2155,32.7063],[-97.2224,32.7047],[-97.223,32.7067],[-97.2191,32.7087],[-97.224,32.7099],[-97.2206,32.71],[-97.219,32.7159],[-97.2153,32.7155],[-97.2123,32.7198],[-97.2192,32.7266],[-97.2135,32.7244],[-97.214,32.7271],[-97.2118,32.7267],[-97.2124,32.7233],[-97.2102,32.7215],[-97.2072,32.7277],[-97.1799,32.7303],[-97.1764,32.7418],[-97.1637,32.7456],[-97.1631,32.7561],[-97.1518,32.7594],[-97.1564,32.7608],[-97.1559,32.7646],[-97.1496,32.7646],[-97.1494,32.7677],[-97.1507,32.7694],[-97.1522,32.767],[-97.1527,32.7691],[-97.1486,32.772],[-97.1395,32.773],[-97.1391,32.7827],[-97.1166,32.7826],[-97.1169,32.7907],[-97.1267,32.7907],[-97.1267,32.7938],[-97.1318,32.7939],[-97.1318,32.8028],[-97.0589,32.8171],[-97.0566,32.8136],[-97.0545,32.8153],[-97.0535,32.8123],[-97.0495,32.811],[-97.0487,32.814],[-97.0455,32.8081],[-97.0424,32.8092],[-97.0376,32.8065],[-97.0371,32.798],[-97.0348,32.7954],[-97.0373,32.7927],[-97.0346,32.7884],[-97.0336,32.8383],[-97.0378,32.8397],[-97.0404,32.8444],[-97.043,32.8398],[-97.0466,32.8386],[-97.0622,32.8432],[-97.0638,32.8385],[-97.0729,32.8368],[-97.0705,32.8282],[-97.0735,32.8288],[-97.0733,32.8226],[-97.1056,32.8224],[-97.1033,32.8176],[-97.1119,32.8156],[-97.111,32.8122],[-97.1139,32.811],[-97.1184,32.8108],[-97.1184,32.8146],[-97.1387,32.8147],[-97.1559,32.8089],[-97.1692,32.8088],[-97.1693,32.8055],[-97.2034,32.8073],[-97.221,32.8004],[-97.221,32.7945],[-97.2287,32.7945],[-97.2287,32.7911],[-97.2307,32.7914],[-97.2307,32.7944],[-97.2362,32.7939],[-97.2432,32.7909],[-97.2432,32.787],[-97.2494,32.7876],[-97.2505,32.7837],[-97.2567,32.7837],[-97.2567,32.7804],[-97.2906,32.781],[-97.2906,32.788],[-97.2934,32.788],[-97.2936,32.7932],[-97.2936,32.7951],[-97.2906,32.7951],[-97.2901,32.8611],[-97.2727,32.861],[-97.2725,32.8692],[-97.2632,32.8682],[-97.2553,32.9166],[-97.2669,32.9167],[-97.266,32.9341],[-97.2553,32.9359],[-97.2727,32.9343],[-97.2727,32.9366],[-97.2766,32.9365],[-97.2766,32.9389],[-97.2553,32.9387],[-97.2552,32.953],[-97.2697,32.9531],[-97.2697,32.9503],[-97.2779,32.9504],[-97.2778,32.9538],[-97.275,32.9537],[-97.2749,32.9571],[-97.271,32.957],[-97.271,32.9637],[-97.269,32.9644],[-97.2646,32.9636],[-97.2646,32.9554],[-97.256,32.9562],[-97.2573,32.9669],[-97.2552,32.9636],[-97.2551,32.9683],[-97.2479,32.9681],[-97.2371,32.9883],[-97.253,32.9884],[-97.2545,32.9929],[-97.2513,32.9929],[-97.2513,32.9998],[-97.2476,32.9997],[-97.2475,33.008],[-97.254,33.0081],[-97.2541,33.0136],[-97.2571,33.0136],[-97.261,33.0081],[-97.2579,33.0188],[-97.2683,33.0198],[-97.2709,33.0187],[-97.2709,33.0151],[-97.2772,33.0156],[-97.2756,33.0254],[-97.2606,33.0425],[-97.2776,33.0448],[-97.2811,33.0471],[-97.2926,33.043],[-97.3051,33.043],[-97.3098,33.0294],[-97.3165,33.0318],[-97.3165,33.035],[-97.3115,33.0352],[-97.3099,33.0389],[-97.3152,33.0391],[-97.3152,33.0473],[-97.3186,33.0492],[-97.3289,33.0456],[-97.3406,33.0358],[-97.3339,33.035],[-97.3415,33.035],[-97.3496,33.0281],[-97.3381,33.0222],[-97.3446,33.0153],[-97.3395,33.0111],[-97.3416,33.0083],[-97.348,33.0084],[-97.3461,33.0051],[-97.3507,33.0052],[-97.3536,33.0206],[-97.3559,33.013],[-97.3564,32.9928],[-97.3591,33.0004],[-97.3821,33.0005],[-97.3818,33.013],[-97.4113,33.0131],[-97.4114,33.0066],[-97.4113,33.0025],[-97.4208,33.0026],[-97.4112,33.0024],[-97.4113,33.0066],[-97.407,33.0069],[-97.4071,33.0036],[-97.4016,33.0036],[-97.4016,32.9999],[-97.3972,33.0],[-97.3968,32.9752],[-97.3972,32.9699],[-97.3993,32.9689],[-97.3992,32.9574],[-97.4028,32.9581],[-97.404,32.969],[-97.4235,32.9681],[-97.4237,32.9576],[-97.4094,32.9576],[-97.4161,32.9502],[-97.4093,32.9501],[-97.4091,32.9396],[-97.4006,32.9373],[-97.4007,32.9245],[-97.392,32.9245],[-97.392,32.9328],[-97.375,32.9327],[-97.375,32.9251],[-97.3728,32.9251],[-97.3746,32.9242],[-97.3747,32.9135],[-97.3881,32.9136],[-97.3887,32.9198],[-97.4046,32.9199],[-97.4078,32.9244],[-97.4119,32.9238],[-97.4095,32.9191],[-97.4219,32.9177],[-97.4217,32.9245],[-97.455,32.9237],[-97.4552,32.9109],[-97.4456,32.9108],[-97.4467,32.9185],[-97.4423,32.9176],[-97.4447,32.9087],[-97.4334,32.9075],[-97.4334,32.9022],[-97.4423,32.9023],[-97.4432,32.8937],[-97.4477,32.898],[-97.4458,32.8987],[-97.4468,32.9024],[-97.4444,32.9077],[-97.4478,32.9077],[-97.4478,32.9053],[-97.4551,32.9054],[-97.453,32.8913],[-97.4465,32.8932],[-97.4479,32.8946],[-97.4467,32.8959],[-97.4453,32.8936],[-97.4465,32.8922],[-97.4427,32.8904],[-97.4407,32.8926],[-97.4388,32.8924],[-97.4418,32.89],[-97.4491,32.8905],[-97.4537,32.8858],[-97.4528,32.8835],[-97.4507,32.8847],[-97.4503,32.8835],[-97.4556,32.8806],[-97.4516,32.8782],[-97.4501,32.8798],[-97.4501,32.8767],[-97.4438,32.877],[-97.4479,32.8757],[-97.4456,32.8631],[-97.441,32.863],[-97.441,32.8577],[-97.4264,32.8576],[-97.4263,32.8521],[-97.4198,32.8509],[-97.4267,32.8509],[-97.4282,32.8446],[-97.4283,32.8501],[-97.4412,32.8501],[-97.4412,32.8437],[-97.4335,32.8381],[-97.4376,32.8279],[-97.4431,32.828],[-97.4413,32.8299],[-97.4479,32.8308],[-97.4491,32.8336],[-97.4473,32.8403],[-97.4534,32.8347],[-97.458,32.836],[-97.4608,32.8433],[-97.4592,32.8494],[-97.4656,32.8556],[-97.4675,32.8525],[-97.4694,32.8535],[-97.4713,32.8577],[-97.4648,32.8576],[-97.4688,32.8635],[-97.486,32.865],[-97.4861,32.8681],[-97.49,32.8669],[-97.4954,32.8707],[-97.4954,32.8675],[-97.5052,32.8657],[-97.5082,32.8669],[-97.5127,32.8675],[-97.5128,32.8605],[-97.5186,32.8606],[-97.5204,32.86],[-97.5072,32.8515],[-97.4861,32.8319],[-97.4982,32.8306],[-97.4981,32.8233],[-97.5094,32.8236],[-97.5095,32.8193],[-97.5082,32.8169],[-97.5012,32.816],[-97.5023,32.788],[-97.4966,32.788],[-97.496,32.7862],[-97.5021,32.7759],[-97.5094,32.7735],[-97.5126,32.7691],[-97.5111,32.7643],[-97.5319,32.7709],[-97.5297,32.7415],[-97.512,32.7413],[-97.512,32.7379],[-97.5209,32.738],[-97.5249,32.7211],[-97.5299,32.7213],[-97.5299,32.7266],[-97.5272,32.7286],[-97.5341,32.7321],[-97.5393,32.7391],[-97.5449,32.7376],[-97.5449,32.7344],[-97.5387,32.7341],[-97.5488,32.7341],[-97.5489,32.7376],[-97.5592,32.7372],[-97.5605,32.7451],[-97.557,32.7457],[-97.5646,32.7515],[-97.5714,32.7515],[-97.5714,32.7644],[-97.5681,32.7772],[-97.5802,32.7756],[-97.5802,32.7722],[-97.5836,32.7721],[-97.5856,32.767],[-97.5801,32.7641],[-97.5801,32.7574],[-97.5728,32.7575],[-97.5727,32.7439],[-97.5829,32.744],[-97.5846,32.7306],[-97.5871,32.728],[-97.5924,32.7288],[-97.5922,32.7185],[-97.5715,32.7169],[-97.5717,32.6762],[-97.5585,32.6809],[-97.5303,32.6804],[-97.5301,32.6953],[-97.5214,32.6953],[-97.5194,32.7077],[-97.5136,32.7077],[-97.5135,32.7116],[-97.5214,32.7116],[-97.5213,32.72],[-97.5107,32.7202],[-97.4998,32.7138],[-97.4889,32.7134],[-97.489,32.7033],[-97.4768,32.7034],[-97.4762,32.7059],[-97.4716,32.6968],[-97.4759,32.6968],[-97.4759,32.689],[-97.4827,32.689],[-97.4827,32.6831],[-97.4868,32.6832],[-97.4868,32.6769],[-97.4862,32.6826],[-97.4821,32.6826],[-97.4821,32.6885],[-97.4752,32.6885],[-97.4752,32.6962],[-97.4714,32.6962],[-97.4647,32.6853],[-97.4625,32.6867],[-97.4786,32.7182],[-97.4576,32.7163],[-97.4577,32.7238],[-97.451,32.723],[-97.4528,32.7163],[-97.4485,32.7163],[-97.4527,32.7137],[-97.4528,32.7063],[-97.4495,32.7057],[-97.4537,32.6977],[-97.4526,32.6943],[-97.4562,32.6943],[-97.4569,32.6871],[-97.44,32.6994],[-97.4362,32.6995],[-97.4346,32.6848],[-97.4264,32.6851],[-97.4297,32.6934],[-97.4277,32.6961],[-97.413,32.6962],[-97.412,32.69],[-97.415,32.6889],[-97.4151,32.6847],[-97.4245,32.6843],[-97.4253,32.6819],[-97.4289,32.6818],[-97.4374,32.6701],[-97.436,32.6669],[-97.442,32.6652],[-97.4424,32.6619],[-97.4473,32.6641],[-97.4505,32.6586],[-97.4468,32.6467],[-97.485,32.6495],[-97.4899,32.6472],[-97.4963,32.6483],[-97.4995,32.6459],[-97.504,32.6472],[-97.5038,32.6731],[-97.4997,32.673],[-97.4981,32.6767],[-97.4851,32.6733],[-97.4806,32.6745],[-97.4771,32.679],[-97.4868,32.6766],[-97.5037,32.6787],[-97.5059,32.6732],[-97.5159,32.6732],[-97.5159,32.6536],[-97.5262,32.6536],[-97.5263,32.6421],[-97.5133,32.6431],[-97.511,32.6409],[-97.5193,32.6299],[-97.5137,32.63],[-97.5139,32.6326],[-97.4884,32.6327],[-97.4917,32.6371],[-97.4803,32.6329],[-97.4804,32.6463],[-97.4823,32.6488],[-97.4774,32.6489],[-97.4772,32.6446],[-97.4417,32.6457],[-97.4421,32.6412],[-97.4387,32.6411],[-97.438,32.6377],[-97.4358,32.6405],[-97.4321,32.6394],[-97.4364,32.6364],[-97.4303,32.6321],[-97.4318,32.6304],[-97.422,32.6282],[-97.4235,32.6257],[-97.4262,32.626],[-97.426,32.6221],[-97.4414,32.6323],[-97.436,32.6191],[-97.4374,32.6169],[-97.4439,32.6268],[-97.4511,32.6321],[-97.4498,32.6283],[-97.4547,32.6309],[-97.4543,32.6247],[-97.4571,32.625],[-97.4574,32.6219],[-97.4617,32.6188],[-97.4464,32.6177],[-97.4465,32.6108],[-97.4269,32.6107],[-97.4269,32.6],[-97.4327,32.6],[-97.4325,32.5887],[-97.4286,32.5739],[-97.41,32.574],[-97.4099,32.587],[-97.4042,32.5872],[-97.4028,32.5946],[-97.3974,32.5946],[-97.3974,32.5893],[-97.3799,32.589],[-97.3797,32.5866],[-97.3765,32.5866],[-97.3763,32.607],[-97.3552,32.607]],[[-97.5817,32.7221],[-97.5869,32.7262],[-97.5806,32.7239],[-97.5817,32.7221]],[[-97.5493,32.7088],[-97.5492,32.7204],[-97.5299,32.7199],[-97.5298,32.711],[-97.5493,32.7088]],[[-97.5186,32.8603],[-97.5127,32.8604],[-97.5126,32.8674],[-97.5053,32.8653],[-97.504,32.8657],[-97.504,32.8603],[-97.4989,32.8532],[-97.4956,32.8532],[-97.4957,32.8427],[-97.5186,32.8603]],[[-97.5121,32.7337],[-97.5124,32.7355],[-97.5121,32.7355],[-97.5121,32.7337]],[[-97.5091,32.8225],[-97.4979,32.8231],[-97.4979,32.8305],[-97.4833,32.8291],[-97.4693,32.8217],[-97.4737,32.8155],[-97.4784,32.8172],[-97.4905,32.8156],[-97.5078,32.8171],[-97.5091,32.8225]],[[-97.4801,32.7415],[-97.4744,32.774],[-97.4638,32.7852],[-97.4636,32.7799],[-97.4674,32.7784],[-97.4534,32.7758],[-97.4602,32.7656],[-97.4391,32.7654],[-97.4391,32.7634],[-97.4353,32.7634],[-97.4353,32.7655],[-97.4278,32.7656],[-97.4278,32.7682],[-97.4154,32.7681],[-97.4058,32.7637],[-97.4009,32.7531],[-97.4295,32.7542],[-97.4447,32.7378],[-97.473,32.7386],[-97.4801,32.7415]],[[-97.471,32.8231],[-97.4636,32.8207],[-97.4621,32.8229],[-97.4565,32.8228],[-97.4565,32.8194],[-97.4621,32.8156],[-97.4655,32.8164],[-97.47,32.818],[-97.4688,32.8223],[-97.471,32.8231]],[[-97.4517,32.7984],[-97.4515,32.8052],[-97.4455,32.8079],[-97.4504,32.8148],[-97.4474,32.8154],[-97.4472,32.8177],[-97.4423,32.8158],[-97.4446,32.8194],[-97.4425,32.8245],[-97.4314,32.8212],[-97.4075,32.8215],[-97.4075,32.812],[-97.3884,32.8064],[-97.3917,32.8036],[-97.3906,32.8003],[-97.3941,32.7989],[-97.3947,32.7946],[-97.3982,32.7959],[-97.3983,32.7928],[-97.404,32.7922],[-97.4,32.7893],[-97.3999,32.7843],[-97.3948,32.7844],[-97.3947,32.7886],[-97.3872,32.7889],[-97.3836,32.7857],[-97.3902,32.7808],[-97.3861,32.7787],[-97.3896,32.777],[-97.3897,32.7717],[-97.386,32.7716],[-97.3862,32.7696],[-97.3899,32.7697],[-97.3914,32.7614],[-97.3943,32.7639],[-97.4077,32.7663],[-97.4077,32.7724],[-97.4112,32.7732],[-97.4127,32.78],[-97.405,32.7849],[-97.4079,32.7907],[-97.4053,32.7927],[-97.4071,32.7962],[-97.412,32.7975],[-97.412,32.8032],[-97.419,32.809],[-97.4398,32.8089],[-97.4399,32.7983],[-97.4517,32.7984]],[[-97.4293,32.8899],[-97.4259,32.8876],[-97.4158,32.8885],[-97.4115,32.8877],[-97.4192,32.8868],[-97.417,32.884],[-97.4173,32.879],[-97.4193,32.8791],[-97.4193,32.881],[-97.4258,32.8811],[-97.4293,32.8899]],[[-97.4253,32.8611],[-97.4241,32.8629],[-97.4201,32.8629],[-97.4202,32.8611],[-97.4253,32.8611]],[[-97.4208,32.7491],[-97.418,32.7524],[-97.4144,32.7513],[-97.4124,32.7456],[-97.4102,32.7491],[-97.4004,32.7426],[-97.4027,32.7388],[-97.4097,32.7397],[-97.4096,32.7374],[-97.4181,32.7372],[-97.4208,32.7491]],[[-97.4081,32.6631],[-97.4158,32.672],[-97.4077,32.6631],[-97.4081,32.6631]],[[-97.4116,32.5872],[-97.4094,32.589],[-97.4094,32.5872],[-97.4116,32.5872]],[[-97.4084,32.8884],[-97.407,32.8987],[-97.3986,32.8987],[-97.3937,32.8883],[-97.4084,32.8884]],[[-97.402,32.6026],[-97.4007,32.5995],[-97.3901,32.5995],[-97.3901,32.5966],[-97.402,32.5965],[-97.402,32.6026]],[[-97.3998,32.8651],[-97.3975,32.8698],[-97.3911,32.8697],[-97.3931,32.8859],[-97.3438,32.8862],[-97.3424,32.8617],[-97.3357,32.8614],[-97.3331,32.8556],[-97.3331,32.8477],[-97.3426,32.8478],[-97.3427,32.8375],[-97.3256,32.8193],[-97.3257,32.8165],[-97.3291,32.8174],[-97.3331,32.8237],[-97.3474,32.8239],[-97.3338,32.8251],[-97.3523,32.8478],[-97.3694,32.8477],[-97.3694,32.846],[-97.3707,32.8478],[-97.3859,32.8479],[-97.382,32.8409],[-97.3888,32.8513],[-97.391,32.8624],[-97.3985,32.8625],[-97.3998,32.8651]],[[-97.3956,32.8408],[-97.3967,32.845],[-97.39,32.8436],[-97.39,32.8409],[-97.3956,32.8408]],[[-97.3921,32.9642],[-97.3919,32.9692],[-97.3792,32.969],[-97.3793,32.9644],[-97.3921,32.9642]],[[-97.3856,32.8979],[-97.3856,32.9027],[-97.375,32.9045],[-97.3751,32.8969],[-97.3856,32.8979]],[[-97.3833,32.8927],[-97.3737,32.8943],[-97.3736,32.8883],[-97.3803,32.8884],[-97.3833,32.8927]],[[-97.3747,32.9387],[-97.3746,32.9464],[-97.3623,32.9462],[-97.3623,32.9553],[-97.3668,32.9553],[-97.3668,32.961],[-97.3667,32.9702],[-97.3621,32.9702],[-97.3618,32.9862],[-97.3348,32.9849],[-97.3282,32.9901],[-97.323,32.9992],[-97.317,32.9719],[-97.3098,32.9719],[-97.3134,32.942],[-97.3227,32.9421],[-97.3227,32.9329],[-97.3317,32.9313],[-97.3319,32.9242],[-97.3486,32.9244],[-97.3486,32.9278],[-97.3549,32.9273],[-97.3533,32.9301],[-97.3549,32.9313],[-97.3609,32.9301],[-97.3607,32.9386],[-97.3747,32.9387]],[[-97.3552,32.607],[-97.3549,32.614],[-97.3506,32.614],[-97.3522,32.607],[-97.3552,32.607]],[[-97.3533,32.6488],[-97.3528,32.6615],[-97.3329,32.6612],[-97.3318,32.6641],[-97.3269,32.6647],[-97.3307,32.6508],[-97.3533,32.6488]],[[-97.3242,33.0348],[-97.3251,33.0381],[-97.3235,33.0381],[-97.3242,33.0348]],[[-97.3116,32.9313],[-97.312,32.9317],[-97.3116,32.9316],[-97.3116,32.9313]],[[-97.3118,32.9423],[-97.3107,32.9463],[-97.311,32.9439],[-97.3079,32.9462],[-97.3066,32.9412],[-97.3101,32.9401],[-97.3066,32.9396],[-97.3103,32.9396],[-97.3118,32.9423]],[[-97.3074,32.9803],[-97.2975,32.9952],[-97.2801,32.9939],[-97.2801,32.999],[-97.2724,32.999],[-97.2705,33.0034],[-97.2722,33.0047],[-97.2687,33.0081],[-97.261,33.0081],[-97.2621,33.0027],[-97.2684,33.0014],[-97.2693,32.999],[-97.2634,32.9931],[-97.2599,32.9929],[-97.2599,32.9908],[-97.2633,32.9907],[-97.2638,32.9797],[-97.2691,32.9784],[-97.2691,32.9759],[-97.2723,32.9784],[-97.2723,32.9762],[-97.2804,32.9755],[-97.2804,32.9784],[-97.2743,32.9784],[-97.2747,32.9873],[-97.2882,32.9875],[-97.2891,32.9727],[-97.2869,32.9745],[-97.2866,32.9721],[-97.2978,32.9722],[-97.2976,32.9819],[-97.3074,32.9803]],[[-97.3046,32.9385],[-97.3067,32.9389],[-97.2982,32.9388],[-97.3046,32.9385]],[[-97.2986,32.9616],[-97.2988,32.9625],[-97.2984,32.9628],[-97.2986,32.9616]],[[-97.2987,32.9563],[-97.2984,32.9563],[-97.2982,32.9556],[-97.2987,32.9563]],[[-97.2944,32.9318],[-97.2943,32.9388],[-97.2895,32.9388],[-97.2895,32.9314],[-97.2944,32.9318]],[[-97.2858,32.9242],[-97.2857,32.9314],[-97.2832,32.9313],[-97.2818,32.9348],[-97.2815,32.9249],[-97.2858,32.9242]],[[-97.285,32.92],[-97.2845,32.924],[-97.2816,32.9242],[-97.2814,32.9244],[-97.2815,32.9261],[-97.2784,32.9261],[-97.2785,32.9241],[-97.2697,32.922],[-97.2697,32.9167],[-97.2762,32.9167],[-97.278,32.9219],[-97.285,32.92]],[[-97.2815,32.9343],[-97.2793,32.9358],[-97.2779,32.9343],[-97.2815,32.9343]],[[-97.2814,32.9389],[-97.2779,32.9389],[-97.2779,32.9369],[-97.2814,32.9368],[-97.2814,32.9389]],[[-97.2785,32.6219],[-97.2764,32.6234],[-97.2764,32.6219],[-97.2785,32.6219]],[[-97.2765,32.9706],[-97.2724,32.9722],[-97.2727,32.9639],[-97.2765,32.9639],[-97.2765,32.9706]],[[-97.2725,32.9164],[-97.2624,32.9164],[-97.2561,32.9164],[-97.2562,32.9149],[-97.2725,32.9164]],[[-97.271,33.0082],[-97.2723,33.0084],[-97.271,33.0084],[-97.271,33.0082]],[[-97.2594,32.9637],[-97.2614,32.9657],[-97.2593,32.9657],[-97.2594,32.9637]]],[[[-97.5365,32.7722],[-97.5337,32.7716],[-97.5336,32.7718],[-97.5365,32.7748],[-97.5365,32.7722]]],[[[-97.4708,32.6933],[-97.4705,32.6935],[-97.4705,32.6935],[-97.4708,32.6933]]],[[[-97.3505,33.036],[-97.3416,33.0359],[-97.3337,33.0424],[-97.3337,33.0447],[-97.3444,33.0495],[-97.3445,33.0459],[-97.3505,33.046],[-97.3505,33.036]]],[[[-97.2826,32.9273],[-97.2821,32.9269],[-97.2821,32.9273],[-97.2826,32.9273]]]]}},{"type":"Feature","properties":{"name":"Austin","osm":"relation/113314"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-97.9368,30.3367],[-97.935,30.3299],[-97.921,30.3238],[-97.9107,30.3274],[-97.8966,30.3399],[-97.8914,30.3285],[-97.8891,30.3363],[-97.8848,30.339],[-97.8859,30.3417],[-97.8809,30.3431],[-97.8809,30.3406],[-97.8801,30.3434],[-97.8581,30.3534],[-97.849,30.3473],[-97.8471,30.3408],[-97.8501,30.3406],[-97.8479,30.3384],[-97.85,30.3395],[-97.8516,30.3395],[-97.848,30.3376],[-97.847,30.3398],[-97.8443,30.3231],[-97.8427,30.325],[-97.8351,30.3231],[-97.8239,30.3285],[-97.8083,30.3487],[-97.8036,30.3504],[-97.8015,30.3499],[-97.8048,30.3444],[-97.8073,30.3454],[-97.8115,30.3426],[-97.8153,30.3354],[-97.8099,30.3307],[-97.8137,30.3245],[-97.8273,30.3139],[-97.8219,30.3141],[-97.8149,30.3067],[-97.7924,30.341],[-97.7792,30.3264],[-97.7785,30.3212],[-97.7819,30.3213],[-97.7829,30.3195],[-97.7805,30.3211],[-97.7786,30.3193],[-97.7806,30.3098],[-97.7846,30.3075],[-97.782,30.307],[-97.7889,30.2983],[-97.7951,30.3033],[-97.7901,30.2943],[-97.7932,30.2948],[-97.7993,30.2896],[-97.7935,30.2868],[-97.7949,30.2847],[-97.7875,30.2835],[-97.791,30.2801],[-97.7892,30.2792],[-97.787,30.2829],[-97.7772,30.2737],[-97.7799,30.2676],[-97.7849,30.267],[-97.7882,30.2701],[-97.7951,30.2685],[-97.8016,30.2753],[-97.8026,30.2736],[-97.8061,30.2752],[-97.8105,30.2718],[-97.8184,30.2769],[-97.827,30.2884],[-97.8292,30.2952],[-97.8323,30.2886],[-97.8405,30.2899],[-97.8507,30.2856],[-97.8524,30.282],[-97.8488,30.2772],[-97.8561,30.2786],[-97.8518,30.2716],[-97.8469,30.2743],[-97.8377,30.2739],[-97.849,30.2554],[-97.8457,30.2538],[-97.8495,30.2481],[-97.8655,30.2579],[-97.8668,30.2559],[-97.87,30.2573],[-97.8669,30.2557],[-97.8823,30.2633],[-97.8875,30.2593],[-97.8988,30.2628],[-97.9005,30.2601],[-97.9128,30.2585],[-97.9151,30.2562],[-97.9112,30.2534],[-97.9041,30.2543],[-97.909,30.2466],[-97.904,30.2442],[-97.907,30.2393],[-97.8912,30.2315],[-97.8956,30.2251],[-97.8917,30.2232],[-97.8967,30.2137],[-97.8879,30.2037],[-97.8922,30.197],[-97.9006,30.2011],[-97.9027,30.1977],[-97.9051,30.199],[-97.911,30.1956],[-97.914,30.1972],[-97.914,30.2032],[-97.9169,30.2035],[-97.9289,30.1861],[-97.9295,30.1746],[-97.9241,30.1728],[-97.9179,30.1654],[-97.9179,30.1587],[-97.9127,30.163],[-97.9147,30.1663],[-97.9129,30.1679],[-97.9103,30.1636],[-97.9065,30.1645],[-97.9068,30.1766],[-97.8965,30.179],[-97.8895,30.1727],[-97.8937,30.1727],[-97.8934,30.1626],[-97.8905,30.1625],[-97.8904,30.1482],[-97.8834,30.1482],[-97.8813,30.1538],[-97.874,30.1523],[-97.8628,30.1371],[-97.8621,30.1441],[-97.8567,30.1405],[-97.8465,30.1412],[-97.8495,30.1438],[-97.847,30.1446],[-97.85,30.1461],[-97.8485,30.1495],[-97.8425,30.1496],[-97.8452,30.1449],[-97.8422,30.1435],[-97.8379,30.1439],[-97.838,30.1495],[-97.8284,30.1476],[-97.8197,30.1719],[-97.8217,30.1623],[-97.8175,30.1617],[-97.8178,30.1499],[-97.8132,30.1479],[-97.8132,30.1447],[-97.8094,30.1449],[-97.8014,30.1429],[-97.8072,30.1329],[-97.7986,30.1352],[-97.8129,30.0985],[-97.8062,30.1124],[-97.7854,30.1127],[-97.8061,30.1126],[-97.8011,30.1256],[-97.7961,30.1233],[-97.7949,30.1277],[-97.7995,30.1295],[-97.7988,30.1313],[-97.7918,30.1291],[-97.79,30.132],[-97.7797,30.1279],[-97.7661,30.1311],[-97.7688,30.1299],[-97.7655,30.1274],[-97.7594,30.1371],[-97.7567,30.1344],[-97.7502,30.145],[-97.7486,30.1442],[-97.7475,30.1462],[-97.751,30.1478],[-97.7497,30.1499],[-97.7377,30.1441],[-97.7353,30.1479],[-97.7358,30.158],[-97.7282,30.1544],[-97.7301,30.1513],[-97.7268,30.1497],[-97.723,30.1561],[-97.7287,30.1588],[-97.7232,30.1675],[-97.7217,30.1721],[-97.7215,30.179],[-97.7214,30.1797],[-97.7211,30.1807],[-97.7204,30.1829],[-97.7211,30.1805],[-97.7113,30.1952],[-97.7062,30.1985],[-97.7095,30.1937],[-97.7052,30.1901],[-97.7009,30.194],[-97.6932,30.187],[-97.6974,30.1803],[-97.6893,30.178],[-97.6881,30.1829],[-97.6827,30.1785],[-97.6814,30.1717],[-97.6751,30.1717],[-97.675,30.1745],[-97.6617,30.1693],[-97.6633,30.1676],[-97.6732,30.1692],[-97.676,30.1668],[-97.6761,30.1637],[-97.6727,30.1624],[-97.6756,30.1562],[-97.6705,30.1515],[-97.6609,30.1657],[-97.6483,30.1772],[-97.6456,30.1854],[-97.6372,30.1813],[-97.6396,30.1774],[-97.6293,30.1725],[-97.637,30.1633],[-97.6316,30.1679],[-97.6235,30.164],[-97.6267,30.1642],[-97.614,30.158],[-97.6169,30.1536],[-97.6105,30.1505],[-97.6036,30.1602],[-97.6162,30.1661],[-97.6129,30.1667],[-97.6078,30.173],[-97.6171,30.1774],[-97.6149,30.1788],[-97.62,30.1812],[-97.6188,30.1835],[-97.621,30.1845],[-97.634,30.1763],[-97.6375,30.1779],[-97.6351,30.1818],[-97.6419,30.1852],[-97.6358,30.1878],[-97.6329,30.1853],[-97.6317,30.1912],[-97.6271,30.1906],[-97.6246,30.1951],[-97.6166,30.1899],[-97.6097,30.2],[-97.6066,30.1984],[-97.6005,30.1996],[-97.6045,30.1934],[-97.601,30.1923],[-97.6034,30.1872],[-97.5982,30.1879],[-97.587,30.2058],[-97.5999,30.2058],[-97.6043,30.2103],[-97.61,30.2101],[-97.6143,30.2135],[-97.6252,30.2097],[-97.6393,30.2093],[-97.6475,30.2129],[-97.6575,30.2268],[-97.6512,30.2338],[-97.6311,30.2395],[-97.6245,30.2502],[-97.6261,30.2565],[-97.6344,30.2567],[-97.6268,30.2685],[-97.6319,30.2715],[-97.6278,30.2781],[-97.6239,30.2763],[-97.6225,30.2785],[-97.6276,30.2808],[-97.6259,30.2836],[-97.6285,30.2849],[-97.6332,30.2775],[-97.6361,30.2789],[-97.6345,30.2814],[-97.6403,30.2842],[-97.6344,30.2913],[-97.6261,30.2885],[-97.6234,30.2928],[-97.6197,30.291],[-97.6222,30.2872],[-97.6089,30.2817],[-97.61,30.2801],[-97.6038,30.2773],[-97.6043,30.2739],[-97.6029,30.2762],[-97.6002,30.2757],[-97.5967,30.2813],[-97.592,30.2763],[-97.5908,30.2781],[-97.5955,30.2831],[-97.5894,30.2885],[-97.5788,30.2887],[-97.5723,30.2994],[-97.5759,30.3011],[-97.5658,30.3157],[-97.5635,30.3145],[-97.5605,30.3302],[-97.5769,30.3391],[-97.5753,30.3416],[-97.5791,30.3421],[-97.5885,30.351],[-97.5931,30.3439],[-97.5954,30.345],[-97.5935,30.3527],[-97.5978,30.3462],[-97.6023,30.3484],[-97.598,30.355],[-97.6061,30.3595],[-97.6073,30.357],[-97.6098,30.3582],[-97.6073,30.362],[-97.6093,30.3628],[-97.6032,30.3685],[-97.5978,30.366],[-97.5924,30.3742],[-97.607,30.3819],[-97.6108,30.3758],[-97.6136,30.377],[-97.6145,30.3743],[-97.6177,30.3759],[-97.6287,30.3628],[-97.6211,30.3649],[-97.618,30.3625],[-97.6229,30.3554],[-97.6191,30.3537],[-97.6236,30.3467],[-97.6166,30.3435],[-97.6242,30.3318],[-97.6274,30.3338],[-97.629,30.3315],[-97.6546,30.3297],[-97.6569,30.3328],[-97.6538,30.3374],[-97.6709,30.3452],[-97.6683,30.3481],[-97.6711,30.3494],[-97.6687,30.3552],[-97.6572,30.351],[-97.6533,30.3531],[-97.6534,30.3552],[-97.6476,30.3524],[-97.6483,30.3563],[-97.6415,30.3534],[-97.6373,30.362],[-97.635,30.3613],[-97.6311,30.3711],[-97.6219,30.3806],[-97.6196,30.3791],[-97.6119,30.3929],[-97.6141,30.3939],[-97.6115,30.3978],[-97.6131,30.4028],[-97.6171,30.4047],[-97.619,30.398],[-97.6209,30.3989],[-97.6237,30.3946],[-97.622,30.3938],[-97.6253,30.3858],[-97.6278,30.388],[-97.6332,30.3794],[-97.6416,30.3836],[-97.64,30.3869],[-97.6426,30.3843],[-97.6468,30.3864],[-97.642,30.3878],[-97.6467,30.39],[-97.6397,30.4014],[-97.637,30.4002],[-97.6354,30.402],[-97.6325,30.3967],[-97.6265,30.4046],[-97.6289,30.4057],[-97.6343,30.403],[-97.6381,30.4045],[-97.6335,30.4135],[-97.6429,30.418],[-97.6486,30.4098],[-97.6634,30.4208],[-97.6594,30.4273],[-97.665,30.4282],[-97.6651,30.4216],[-97.6687,30.4234],[-97.6625,30.4332],[-97.651,30.4277],[-97.6498,30.4295],[-97.6529,30.4331],[-97.6505,30.4367],[-97.6646,30.4438],[-97.6615,30.4484],[-97.6651,30.45],[-97.6685,30.4448],[-97.6727,30.4248],[-97.6967,30.4368],[-97.6953,30.4491],[-97.6982,30.4505],[-97.7046,30.4487],[-97.7082,30.4504],[-97.7108,30.4464],[-97.7024,30.4413],[-97.7021,30.4351],[-97.7081,30.4382],[-97.7109,30.4336],[-97.7156,30.4373],[-97.7212,30.4288],[-97.7292,30.433],[-97.7283,30.4392],[-97.7339,30.4412],[-97.7388,30.4396],[-97.7413,30.4441],[-97.7482,30.4419],[-97.7498,30.4456],[-97.7621,30.4412],[-97.7642,30.4464],[-97.7613,30.4486],[-97.7649,30.4569],[-97.7621,30.46],[-97.7667,30.4673],[-97.7739,30.4651],[-97.7731,30.4634],[-97.7765,30.462],[-97.7748,30.4538],[-97.7832,30.4513],[-97.7877,30.4531],[-97.7897,30.4575],[-97.7821,30.4606],[-97.7842,30.4658],[-97.7805,30.4725],[-97.7599,30.4774],[-97.7638,30.4792],[-97.7637,30.4819],[-97.7573,30.4839],[-97.7585,30.4874],[-97.7564,30.488],[-97.7554,30.485],[-97.7495,30.4862],[-97.7539,30.496],[-97.7519,30.4959],[-97.7503,30.4998],[-97.7448,30.5012],[-97.7464,30.5052],[-97.7441,30.5059],[-97.7486,30.5166],[-97.762,30.5063],[-97.7662,30.5073],[-97.7753,30.5034],[-97.7899,30.5058],[-97.806,30.4953],[-97.8052,30.4905],[-97.8075,30.4876],[-97.8032,30.4798],[-97.8153,30.4754],[-97.8106,30.4639],[-97.8201,30.4608],[-97.8255,30.4557],[-97.8288,30.4561],[-97.8285,30.4524],[-97.8235,30.4536],[-97.8209,30.4511],[-97.8267,30.4422],[-97.8327,30.4448],[-97.8337,30.4429],[-97.8281,30.4399],[-97.8296,30.4376],[-97.8353,30.4401],[-97.8335,30.4381],[-97.8367,30.4393],[-97.839,30.4371],[-97.8413,30.44],[-97.8447,30.4325],[-97.8481,30.4367],[-97.8514,30.4352],[-97.8564,30.4374],[-97.8633,30.4342],[-97.8597,30.4282],[-97.8688,30.4171],[-97.8625,30.4089],[-97.8548,30.4042],[-97.8556,30.4],[-97.863,30.3944],[-97.8841,30.3623],[-97.8794,30.3601],[-97.8912,30.3434],[-97.8978,30.3417],[-97.8992,30.3437],[-97.8983,30.3414],[-97.9185,30.3274],[-97.9271,30.3277],[-97.9333,30.3333],[-97.9315,30.3385],[-97.913,30.359],[-97.9137,30.3847],[-97.9114,30.3841],[-97.9135,30.385],[-97.9116,30.3888],[-97.9053,30.3897],[-97.9032,30.3923],[-97.9064,30.394],[-97.9149,30.3869],[-97.9168,30.3767],[-97.9152,30.3769],[-97.9149,30.3585],[-97.9175,30.3544],[-97.9216,30.3566],[-97.9179,30.3538],[-97.9368,30.3367]],[[-97.8745,30.1729],[-97.8703,30.173],[-97.8681,30.1777],[-97.8615,30.176],[-97.8565,30.1787],[-97.8531,30.1781],[-97.8561,30.1734],[-97.8504,30.1734],[-97.8502,30.159],[-97.8601,30.1588],[-97.8592,30.1557],[-97.8621,30.1547],[-97.8599,30.1457],[-97.8675,30.1491],[-97.8617,30.1495],[-97.8743,30.1535],[-97.8745,30.1729]],[[-97.8625,30.3564],[-97.851,30.3622],[-97.8334,30.3862],[-97.8185,30.3791],[-97.8124,30.3801],[-97.8113,30.3822],[-97.8057,30.3774],[-97.8096,30.3705],[-97.8034,30.3646],[-97.8003,30.3673],[-97.8031,30.3633],[-97.8141,30.3628],[-97.8142,30.3599],[-97.8111,30.3593],[-97.8121,30.3569],[-97.8081,30.3536],[-97.81,30.3511],[-97.815,30.3511],[-97.8115,30.3495],[-97.817,30.3401],[-97.8237,30.3338],[-97.8257,30.3368],[-97.8247,30.3326],[-97.8318,30.3263],[-97.8349,30.3306],[-97.8249,30.3465],[-97.8201,30.3442],[-97.8176,30.3483],[-97.8329,30.3555],[-97.8335,30.3537],[-97.837,30.3549],[-97.8411,30.3484],[-97.8625,30.3564]],[[-97.8471,30.3854],[-97.8448,30.3889],[-97.8396,30.3864],[-97.8445,30.379],[-97.8453,30.3858],[-97.8471,30.3854]],[[-97.8372,30.3261],[-97.8352,30.3296],[-97.8335,30.326],[-97.8372,30.3261]],[[-97.8356,30.17],[-97.8293,30.1698],[-97.8244,30.1723],[-97.8323,30.1622],[-97.8343,30.1625],[-97.8356,30.17]],[[-97.833,30.1498],[-97.8323,30.1533],[-97.8294,30.1534],[-97.8293,30.1504],[-97.833,30.1498]],[[-97.8299,30.2223],[-97.8204,30.2342],[-97.8167,30.2337],[-97.8102,30.2399],[-97.8072,30.24],[-97.8111,30.234],[-97.803,30.2324],[-97.8063,30.2268],[-97.8039,30.2256],[-97.8062,30.222],[-97.8166,30.2147],[-97.8278,30.2179],[-97.8262,30.2204],[-97.8299,30.2223]],[[-97.8178,30.2672],[-97.8163,30.2715],[-97.8078,30.2662],[-97.8144,30.2632],[-97.8114,30.2579],[-97.8178,30.2672]],[[-97.8175,30.4097],[-97.8127,30.4156],[-97.8075,30.4162],[-97.806,30.4184],[-97.8095,30.419],[-97.8084,30.4226],[-97.8029,30.4195],[-97.7937,30.4209],[-97.795,30.4155],[-97.7922,30.409],[-97.7902,30.4093],[-97.7905,30.4136],[-97.7834,30.4206],[-97.7849,30.4267],[-97.7818,30.4296],[-97.7772,30.4253],[-97.7805,30.4207],[-97.7799,30.4153],[-97.7829,30.4125],[-97.7777,30.4113],[-97.783,30.403],[-97.7828,30.3992],[-97.7812,30.398],[-97.7794,30.4008],[-97.7755,30.3973],[-97.7745,30.3988],[-97.7784,30.3916],[-97.7741,30.3889],[-97.7815,30.3875],[-97.7885,30.3918],[-97.7875,30.3934],[-97.8123,30.4041],[-97.8108,30.4065],[-97.8175,30.4097]],[[-97.8161,30.2394],[-97.8133,30.2406],[-97.8126,30.2386],[-97.8148,30.2376],[-97.8161,30.2394]],[[-97.8111,30.3593],[-97.8108,30.3591],[-97.8108,30.3591],[-97.8111,30.3593]],[[-97.807,30.3724],[-97.8075,30.3729],[-97.8069,30.3727],[-97.807,30.3724]],[[-97.8062,30.2431],[-97.8048,30.2464],[-97.8033,30.2455],[-97.8062,30.2431]],[[-97.8059,30.3727],[-97.8067,30.3736],[-97.8058,30.375],[-97.8059,30.3727]],[[-97.8056,30.2717],[-97.8024,30.2729],[-97.8018,30.2725],[-97.804,30.2694],[-97.8056,30.2717]],[[-97.8047,30.3716],[-97.8044,30.3738],[-97.8038,30.3717],[-97.8047,30.3716]],[[-97.7843,30.1623],[-97.7822,30.1666],[-97.782,30.163],[-97.7843,30.1623]],[[-97.7827,30.1573],[-97.7739,30.1591],[-97.777,30.1641],[-97.7754,30.1652],[-97.7802,30.1672],[-97.7798,30.1714],[-97.7814,30.1715],[-97.7794,30.1746],[-97.7778,30.1713],[-97.7683,30.1711],[-97.7639,30.1682],[-97.7638,30.164],[-97.7607,30.1641],[-97.7645,30.1576],[-97.7619,30.1566],[-97.7673,30.1479],[-97.7664,30.1461],[-97.7636,30.1503],[-97.7613,30.1492],[-97.7663,30.1427],[-97.7675,30.1444],[-97.7725,30.1433],[-97.7827,30.1573]],[[-97.7784,30.1441],[-97.7759,30.1443],[-97.776,30.1412],[-97.7771,30.1414],[-97.7784,30.1441]],[[-97.7766,30.1774],[-97.7768,30.1786],[-97.7763,30.1785],[-97.7766,30.1774]],[[-97.7745,30.1754],[-97.7732,30.1782],[-97.77,30.1787],[-97.7696,30.175],[-97.7745,30.1754]],[[-97.7492,30.1562],[-97.7516,30.1589],[-97.7486,30.1573],[-97.7492,30.1562]],[[-97.7498,30.1596],[-97.7503,30.1605],[-97.7495,30.1601],[-97.7498,30.1596]],[[-97.6814,30.241],[-97.6802,30.2475],[-97.6595,30.2626],[-97.6424,30.2629],[-97.6413,30.2561],[-97.6263,30.2549],[-97.6267,30.2493],[-97.6328,30.2409],[-97.6528,30.2346],[-97.6617,30.2253],[-97.6642,30.2284],[-97.6674,30.2269],[-97.6725,30.2341],[-97.6763,30.2357],[-97.678,30.2341],[-97.6764,30.2368],[-97.6814,30.241]],[[-97.6713,30.3493],[-97.6713,30.3493],[-97.6712,30.3493],[-97.6713,30.3493]],[[-97.6702,30.325],[-97.66,30.3278],[-97.6607,30.3264],[-97.657,30.3251],[-97.6626,30.317],[-97.6702,30.325]],[[-97.6663,30.3622],[-97.6678,30.369],[-97.6658,30.3681],[-97.6665,30.3658],[-97.6639,30.3645],[-97.6663,30.3622]],[[-97.6658,30.3278],[-97.6657,30.3273],[-97.6657,30.3273],[-97.6658,30.3278]],[[-97.6526,30.324],[-97.6501,30.3233],[-97.6499,30.3279],[-97.6437,30.329],[-97.6443,30.3241],[-97.6524,30.3222],[-97.6526,30.324]],[[-97.6516,30.1984],[-97.6456,30.2037],[-97.6409,30.1997],[-97.6468,30.1944],[-97.6516,30.1984]],[[-97.6434,30.3075],[-97.637,30.3119],[-97.6306,30.3078],[-97.6282,30.316],[-97.6331,30.3183],[-97.6301,30.323],[-97.6352,30.3271],[-97.6408,30.3252],[-97.6429,30.3264],[-97.6411,30.3292],[-97.6006,30.3347],[-97.6191,30.3046],[-97.6295,30.31],[-97.6303,30.3077],[-97.6328,30.3063],[-97.6434,30.3075]],[[-97.6381,30.3117],[-97.6381,30.3117],[-97.6379,30.3117],[-97.6381,30.3117]],[[-97.6219,30.3892],[-97.6204,30.3916],[-97.6192,30.391],[-97.6203,30.3885],[-97.6219,30.3892]],[[-97.6184,30.3866],[-97.6186,30.3873],[-97.618,30.3871],[-97.6184,30.3866]],[[-97.6107,30.3425],[-97.6058,30.35],[-97.6023,30.3483],[-97.6071,30.3409],[-97.6107,30.3425]],[[-97.5943,30.3388],[-97.584,30.3429],[-97.583,30.3432],[-97.5943,30.3388]],[[-97.5941,30.3383],[-97.5921,30.3384],[-97.5933,30.3367],[-97.5941,30.3383]],[[-97.592,30.3089],[-97.5864,30.3176],[-97.582,30.3137],[-97.5833,30.3047],[-97.592,30.3089]]],[[[-97.8102,30.1396],[-97.8079,30.1392],[-97.805,30.1435],[-97.8083,30.1443],[-97.8102,30.1396]]],[[[-97.7543,30.4609],[-97.7513,30.4538],[-97.746,30.4498],[-97.7506,30.4535],[-97.7478,30.4538],[-97.7453,30.4618],[-97.7543,30.4609]]],[[[-97.7461,30.4495],[-97.7442,30.4476],[-97.7419,30.4442],[-97.7439,30.4477],[-97.7461,30.4495]]],[[[-97.7177,30.1845],[-97.7148,30.1816],[-97.7085,30.1813],[-97.703,30.1846],[-97.7129,30.1886],[-97.7177,30.1845]]],[[[-97.6501,30.1392],[-97.6461,30.1375],[-97.6489,30.1331],[-97.6398,30.1287],[-97.6408,30.1269],[-97.6362,30.1217],[-97.6327,30.125],[-97.6368,30.1285],[-97.6349,30.1313],[-97.626,30.127],[-97.6251,30.1284],[-97.6314,30.1298],[-97.6317,30.1319],[-97.6239,30.1302],[-97.6291,30.1329],[-97.6277,30.1352],[-97.6238,30.1389],[-97.6207,30.1349],[-97.6191,30.1375],[-97.6183,30.1389],[-97.6243,30.1418],[-97.6219,30.1455],[-97.6158,30.1427],[-97.6132,30.1465],[-97.6219,30.1508],[-97.6277,30.1424],[-97.6425,30.1494],[-97.6501,30.1392]]],[[[-97.6307,30.3601],[-97.6278,30.3547],[-97.6253,30.3586],[-97.6307,30.3601]]]]}},{"type":"Feature","properties":{"name":"Arlington","osm":"relation/115329"},"geometry":{"type":"Polygon","coordinates":[[[-97.2338,32.6878],[-97.23,32.6813],[-97.2298,32.6772],[-97.2337,32.6716],[-97.2316,32.6675],[-97.2235,32.6668],[-97.224,32.6604],[-97.2171,32.6604],[-97.2165,32.6564],[-97.2117,32.6567],[-97.2118,32.6604],[-97.2089,32.6604],[-97.2084,32.6669],[-97.2055,32.6672],[-97.2069,32.6567],[-97.1978,32.6543],[-97.2002,32.6493],[-97.1946,32.6493],[-97.1945,32.6464],[-97.1892,32.6462],[-97.189,32.6347],[-97.193,32.6347],[-97.1929,32.6312],[-97.1997,32.6304],[-97.2009,32.6276],[-97.1807,32.6086],[-97.1697,32.6138],[-97.1546,32.6139],[-97.1546,32.6161],[-97.14,32.616],[-97.1425,32.6114],[-97.1255,32.6114],[-97.1203,32.6139],[-97.1166,32.6083],[-97.1058,32.6134],[-97.0938,32.5967],[-97.0907,32.5981],[-97.0831,32.5868],[-97.0785,32.5901],[-97.0765,32.6171],[-97.0659,32.6326],[-97.0639,32.6407],[-97.0633,32.6684],[-97.059,32.6756],[-97.0543,32.6765],[-97.061,32.68],[-97.0619,32.7037],[-97.0609,32.706],[-97.0474,32.7059],[-97.0458,32.728],[-97.0563,32.7281],[-97.0564,32.7352],[-97.0498,32.7351],[-97.046,32.7378],[-97.0459,32.7448],[-97.0404,32.7448],[-97.0398,32.7538],[-97.037,32.754],[-97.0372,32.7614],[-97.0456,32.7615],[-97.0456,32.7643],[-97.0629,32.7633],[-97.0627,32.8081],[-97.0597,32.8079],[-97.0592,32.8148],[-97.0566,32.8136],[-97.0589,32.8171],[-97.1318,32.8028],[-97.1318,32.7939],[-97.1267,32.7938],[-97.1267,32.7907],[-97.1169,32.7907],[-97.1166,32.7826],[-97.1391,32.7827],[-97.1395,32.773],[-97.1486,32.772],[-97.1527,32.7691],[-97.1522,32.767],[-97.1507,32.7694],[-97.1494,32.7677],[-97.1496,32.7646],[-97.1559,32.7646],[-97.1564,32.7608],[-97.1518,32.7594],[-97.1631,32.7561],[-97.1637,32.7456],[-97.1764,32.7418],[-97.1799,32.7303],[-97.2072,32.7277],[-97.2102,32.7215],[-97.2124,32.7233],[-97.2118,32.7267],[-97.214,32.7271],[-97.2135,32.7244],[-97.2192,32.7266],[-97.2123,32.7199],[-97.2153,32.7155],[-97.219,32.7159],[-97.2206,32.71],[-97.224,32.7099],[-97.2191,32.7087],[-97.223,32.7067],[-97.2224,32.7047],[-97.2157,32.7067],[-97.2186,32.7034],[-97.2168,32.6994],[-97.2185,32.6972],[-97.2224,32.6993],[-97.2322,32.6953],[-97.2338,32.6878]],[[-97.1697,32.6935],[-97.1665,32.6979],[-97.1612,32.6979],[-97.1612,32.7108],[-97.1664,32.7108],[-97.1663,32.7213],[-97.1502,32.7213],[-97.1426,32.7236],[-97.1407,32.7199],[-97.149,32.7192],[-97.1491,32.7106],[-97.1381,32.7103],[-97.138,32.7066],[-97.1492,32.7068],[-97.1496,32.6778],[-97.1644,32.6801],[-97.1643,32.6905],[-97.1697,32.6935]]]}},{"type":"Feature","properties":{"name":"Plano","osm":"relation/6575893"},"geometry":{"type":"Polygon","coordinates":[[[-96.86,33.042],[-96.8532,33.042],[-96.8562,33.031],[-96.8524,33.0309],[-96.8525,33.0261],[-96.8353,33.0274],[-96.8355,33.024],[-96.8393,33.0256],[-96.8392,33.0191],[-96.8434,33.019],[-96.8435,33.0165],[-96.7944,33.0131],[-96.7689,33.0001],[-96.7452,33.0037],[-96.7063,33.004],[-96.6808,33.0024],[-96.6709,32.9971],[-96.6651,32.9971],[-96.665,33.0039],[-96.613,33.005],[-96.6129,33.0095],[-96.631,33.0104],[-96.6355,33.0188],[-96.6413,33.019],[-96.6425,33.0266],[-96.6404,33.0373],[-96.6435,33.0431],[-96.6412,33.0441],[-96.6393,33.0523],[-96.6504,33.0532],[-96.6539,33.0508],[-96.6563,33.053],[-96.6558,33.0749],[-96.6585,33.0728],[-96.6822,33.0731],[-96.6853,33.0709],[-96.6856,33.0754],[-96.694,33.079],[-96.6979,33.0846],[-96.7048,33.0887],[-96.7091,33.0895],[-96.7118,33.0846],[-96.7367,33.0861],[-96.7336,33.0916],[-96.7328,33.1252],[-96.8132,33.0938],[-96.8524,33.0825],[-96.8511,33.0762],[-96.855,33.0762],[-96.8572,33.0607],[-96.8428,33.0601],[-96.8428,33.0562],[-96.8449,33.0518],[-96.8584,33.0531],[-96.86,33.042]]]}},{"type":"Feature","properties":{"name":"Irving","osm":"relation/5748832"},"geometry":{"type":"Polygon","coordinates":[[[-97.034,32.8166],[-97.0257,32.8162],[-97.0256,32.8121],[-97.0228,32.8121],[-97.0229,32.8162],[-96.9947,32.8155],[-96.9955,32.7778],[-96.9777,32.7778],[-96.9771,32.7831],[-96.9599,32.7831],[-96.96,32.7734],[-96.9581,32.7718],[-96.9533,32.7789],[-96.9505,32.7783],[-96.9534,32.7762],[-96.9523,32.7744],[-96.9187,32.7857],[-96.914,32.7844],[-96.9075,32.7969],[-96.8983,32.7982],[-96.9088,32.8095],[-96.9061,32.8094],[-96.9054,32.8169],[-96.89,32.8311],[-96.8897,32.8403],[-96.8913,32.8379],[-96.8919,32.8426],[-96.8898,32.8427],[-96.8888,32.8477],[-96.8938,32.8473],[-96.8997,32.8515],[-96.9161,32.8518],[-96.9169,32.8585],[-96.9252,32.8588],[-96.9222,32.8617],[-96.9253,32.8633],[-96.9242,32.8657],[-96.9269,32.866],[-96.9252,32.8709],[-96.9274,32.8693],[-96.9315,32.8713],[-96.9282,32.8827],[-96.9323,32.8845],[-96.9301,32.8873],[-96.931,32.8907],[-96.9272,32.8919],[-96.9286,32.8965],[-96.9268,32.9026],[-96.9317,32.9071],[-96.9323,32.9116],[-96.9384,32.9137],[-96.9385,32.9224],[-96.9359,32.925],[-96.9374,32.9277],[-96.933,32.9291],[-96.9403,32.9322],[-96.9389,32.9352],[-96.9353,32.9349],[-96.9352,32.937],[-96.9413,32.9386],[-96.9436,32.9473],[-96.9556,32.9505],[-96.9618,32.9491],[-96.9682,32.954],[-96.9701,32.9494],[-96.9676,32.9475],[-96.9677,32.9253],[-96.9936,32.9258],[-96.9937,32.9225],[-97.0018,32.9272],[-97.017,32.9432],[-97.0321,32.9439],[-97.0325,32.8951],[-97.0283,32.8951],[-97.0281,32.8841],[-97.0331,32.884],[-97.034,32.8166]]]}},{"type":"Feature","properties":{"name":"Garland","osm":"relation/253954"},"geometry":{"type":"Polygon","coordinates":[[[-96.7057,32.9166],[-96.7005,32.9165],[-96.7006,32.9092],[-96.6976,32.9092],[-96.6975,32.9026],[-96.6917,32.9041],[-96.6937,32.8903],[-96.6904,32.8903],[-96.6905,32.886],[-96.6832,32.886],[-96.6832,32.8789],[-96.69,32.8788],[-96.6514,32.8571],[-96.6354,32.8434],[-96.6284,32.8493],[-96.6167,32.8394],[-96.6066,32.8402],[-96.6058,32.8442],[-96.6019,32.8418],[-96.6002,32.8387],[-96.6103,32.8347],[-96.6093,32.8325],[-96.6001,32.8363],[-96.5956,32.8332],[-96.5663,32.8343],[-96.5645,32.8301],[-96.5597,32.8337],[-96.5604,32.8398],[-96.5566,32.8398],[-96.5564,32.8466],[-96.5496,32.8489],[-96.5451,32.8468],[-96.5476,32.8579],[-96.5396,32.858],[-96.54,32.8639],[-96.5371,32.8665],[-96.5442,32.8682],[-96.553,32.862],[-96.5644,32.8629],[-96.5713,32.8684],[-96.5727,32.8661],[-96.5768,32.8661],[-96.5852,32.8708],[-96.5952,32.8839],[-96.5926,32.885],[-96.5972,32.8907],[-96.595,32.8935],[-96.5944,32.8884],[-96.589,32.8845],[-96.5924,32.8939],[-96.5931,32.92],[-96.5859,32.9286],[-96.5751,32.9366],[-96.5825,32.9418],[-96.5746,32.948],[-96.5546,32.9467],[-96.5512,32.9482],[-96.5491,32.9404],[-96.5426,32.9455],[-96.5484,32.9503],[-96.53,32.9636],[-96.5329,32.9661],[-96.5354,32.964],[-96.5339,32.9625],[-96.5375,32.9656],[-96.5436,32.9607],[-96.5469,32.9634],[-96.5523,32.9598],[-96.5506,32.9574],[-96.5527,32.9532],[-96.5506,32.9502],[-96.5546,32.947],[-96.5748,32.9482],[-96.5838,32.9415],[-96.5896,32.9472],[-96.5871,32.9523],[-96.6131,32.9738],[-96.6134,32.9843],[-96.6823,32.9852],[-96.6828,32.9313],[-96.7057,32.9314],[-96.7057,32.9166]]]}},{"type":"Feature","properties":{"name":"Frisco","osm":"relation/6579857"},"geometry":{"type":"Polygon","coordinates":[[[-96.9228,33.1411],[-96.9207,33.1299],[-96.9175,33.1322],[-96.916,33.1307],[-96.9123,33.132],[-96.9114,33.1342],[-96.9106,33.1309],[-96.9061,33.1314],[-96.9089,33.1294],[-96.9037,33.1285],[-96.8945,33.1338],[-96.9018,33.1244],[-96.905,33.1261],[-96.9052,33.1201],[-96.8953,33.1201],[-96.8932,33.1229],[-96.8916,33.1182],[-96.8863,33.1185],[-96.8917,33.1161],[-96.8916,33.1073],[-96.8872,33.1057],[-96.8897,33.1035],[-96.8846,33.1029],[-96.8835,33.0988],[-96.8812,33.1055],[-96.8692,33.1055],[-96.8692,33.1083],[-96.8532,33.1064],[-96.8568,33.0914],[-96.8554,33.0811],[-96.8132,33.0938],[-96.7328,33.1252],[-96.733,33.189],[-96.7415,33.189],[-96.7416,33.1816],[-96.7679,33.182],[-96.7678,33.1891],[-96.7625,33.1891],[-96.7624,33.1964],[-96.7678,33.1965],[-96.7677,33.2037],[-96.7853,33.2039],[-96.7853,33.193],[-96.7939,33.193],[-96.794,33.1966],[-96.7897,33.1966],[-96.7896,33.2039],[-96.7939,33.204],[-96.794,33.2116],[-96.7676,33.2121],[-96.7676,33.2183],[-96.7554,33.2184],[-96.7555,33.2107],[-96.7521,33.2107],[-96.7503,33.2184],[-96.8387,33.2196],[-96.8387,33.2145],[-96.8321,33.2146],[-96.8298,33.2054],[-96.8422,33.2056],[-96.842,33.211],[-96.8455,33.2111],[-96.8456,33.2144],[-96.8421,33.2144],[-96.842,33.2196],[-96.8875,33.2193],[-96.8961,33.2114],[-96.8877,33.2112],[-96.8878,33.204],[-96.8805,33.2039],[-96.887,33.1899],[-96.8873,33.1784],[-96.8819,33.1783],[-96.8822,33.163],[-96.8865,33.1632],[-96.8866,33.1587],[-96.8907,33.1587],[-96.8908,33.1514],[-96.8994,33.1516],[-96.8996,33.1546],[-96.9118,33.1546],[-96.9141,33.1411],[-96.9228,33.1411]],[[-96.8884,33.2168],[-96.8882,33.2172],[-96.8874,33.2168],[-96.8884,33.2168]]]}},{"type":"Feature","properties":{"name":"Richardson","osm":"relation/6577487"},"geometry":{"type":"Polygon","coordinates":[[[-96.7691,32.9398],[-96.7483,32.9399],[-96.7485,32.9341],[-96.7415,32.9347],[-96.7487,32.9233],[-96.7182,32.9254],[-96.7182,32.9313],[-96.6828,32.9313],[-96.6823,32.9852],[-96.6134,32.9843],[-96.613,33.0036],[-96.665,33.0039],[-96.6651,32.9971],[-96.6709,32.9971],[-96.6808,33.0024],[-96.7032,33.0039],[-96.7452,33.0037],[-96.7564,33.001],[-96.7551,32.9971],[-96.7575,32.9829],[-96.7683,32.9829],[-96.7691,32.9398]]]}}]};
-const LIBRARIES = [
-  {"name": "Eugene McDermott Library", "region": "Dallas", "lat": 32.986907, "lng": -96.747632, "addr": "800 West Campbell Road, Richardson", "web": "", "osm": "way/221317443"},
-  {"name": "Bachman Lake Branch Library", "region": "Dallas", "lat": 32.862658, "lng": -96.859382, "addr": "9480 Webb Chapel Road, Dallas", "web": "https://www.dallaslibrary.org/branches/bachman-lake-branch", "osm": "way/466984268"},
-  {"name": "White Rock Hills Branch Library", "region": "Dallas", "lat": 32.814, "lng": -96.691778, "addr": "9150 Ferguson Road, Dallas", "web": "", "osm": "way/587739362"},
-  {"name": "Dallas Public Library Lochwood Branch", "region": "Dallas", "lat": 32.848412, "lng": -96.688269, "addr": "11221 Lochwood Boulevard, Dallas", "web": "https://dallaslibrary2.org/branch/lochwood.php", "osm": "way/411079645"},
-  {"name": "Dallas Public Library - Lake June Branch", "region": "Dallas", "lat": 32.733804, "lng": -96.695828, "addr": "Lake June Road, Dallas", "web": "", "osm": "way/675827169"},
-  {"name": "Arcadia Park Branch Library", "region": "Dallas", "lat": 32.759124, "lng": -96.909514, "addr": "1302 North Justin Avenue, Dallas", "web": "", "osm": "way/1527334664"},
-  {"name": "Vickery Park Branch Library", "region": "Dallas", "lat": 32.871869, "lng": -96.761595, "addr": "8333 Park Lane, Dallas", "web": "https://dallaslibrary2.org/branch/vickerypark.php", "osm": "way/1018303895"},
-  {"name": "Dallas Public Library - Fretz Branch", "region": "Dallas", "lat": 32.949587, "lng": -96.78327, "addr": "6990 Belt Line Road, Dallas", "web": "https://dallaslibrary2.org/branch/fretz.php", "osm": "way/470761102"},
-  {"name": "Dallas Public Library - Oak Lawn", "region": "Dallas", "lat": 32.812378, "lng": -96.812414, "addr": "4100 Cedar Springs Road, Dallas", "web": "", "osm": "way/221378901"},
-  {"name": "Highland Hills Branch Library", "region": "Dallas", "lat": 32.670714, "lng": -96.760761, "addr": "Highland Hills Drive, Dallas", "web": "", "osm": "way/663201460"},
-  {"name": "Renner Frankford Library Branch", "region": "Dallas", "lat": 32.997721, "lng": -96.794614, "addr": "6400 Frankford Road, Dallas", "web": "", "osm": "way/469579265"},
-  {"name": "Timberglen Branch Library", "region": "Dallas", "lat": 33.003624, "lng": -96.84513, "addr": "18505 Midway Road, Dallas", "web": "https://www.dallaslibrary.org/branches/timberglen-branch-library", "osm": "way/423963016"},
-  {"name": "Martin Luther King Jr. Branch Library", "region": "Dallas", "lat": 32.770564, "lng": -96.766048, "addr": "2922 Martin Luther King Junior Boulevard, Dallas", "web": "", "osm": "way/464807904"},
-  {"name": "Dallas Public Library Audelia Road Branch", "region": "Dallas", "lat": 32.885749, "lng": -96.718347, "addr": "10045 Audelia Road, Dallas", "web": "https://dallaslibrary2.org/branch/audelia.php", "osm": "way/411081134"},
-  {"name": "Lakewood Public Library", "region": "Dallas", "lat": 32.810375, "lng": -96.753423, "addr": "6121 Worth Street, Dallas", "web": "", "osm": "way/465726719"},
-  {"name": "North Oak Cliff Branch Library", "region": "Dallas", "lat": 32.744801, "lng": -96.827018, "addr": "302 West 10th Street, Dallas", "web": "", "osm": "way/465273084"},
-  {"name": "Dallas West Branch Library", "region": "Dallas", "lat": 32.778338, "lng": -96.860047, "addr": "2332 Singleton Boulevard, Dallas", "web": "", "osm": "way/466701931"},
-  {"name": "Mountain Creek Public Library", "region": "Dallas", "lat": 32.650604, "lng": -96.966045, "addr": "6102 Mountain Creek Parkway, Dallas", "web": "https://www.dallaslibrary.org/branches/mountain-creek-branch", "osm": "way/468812955"},
-  {"name": "Polk-Wisdom Branch Library", "region": "Dallas", "lat": 32.661656, "lng": -96.842038, "addr": "7151 Library Lane, Dallas", "web": "https://www.dallaslibrary.org/branches/polk-wisdom-branch-library", "osm": "way/468820040"},
-  {"name": "Park Forest Library", "region": "Dallas", "lat": 32.910101, "lng": -96.863568, "addr": "3421 Forest Lane, Dallas", "web": "https://www.dallaslibrary.org/branches/park-forest-branch-library", "osm": "way/467534814"},
-  {"name": "Preston Royal Branch Library", "region": "Dallas", "lat": 32.894365, "lng": -96.811315, "addr": "5626 Royal Lane, Dallas", "web": "https://dallaslibrary2.org/branch/preston.php", "osm": "way/351237347"},
-  {"name": "Parr Library", "region": "Dallas", "lat": 33.055615, "lng": -96.834426, "addr": "Windhaven Parkway, Plano", "web": "", "osm": "way/422058477"},
-  {"name": "Davis Library", "region": "Dallas", "lat": 33.080416, "lng": -96.751734, "addr": "7501-B Independence Parkway, Plano", "web": "https://www.plano.gov/davis-library", "osm": "way/511178768"},
-  {"name": "W O Haggard Junior Library", "region": "Dallas", "lat": 33.032313, "lng": -96.770883, "addr": "2501 Coit Road, Plano", "web": "", "osm": "way/650798421"},
-  {"name": "Schimelpfenig Public Library", "region": "Dallas", "lat": 33.055198, "lng": -96.732702, "addr": "5024 Custer Road, Plano", "web": "", "osm": "way/479801571"},
-  {"name": "South Garland Branch Library", "region": "Dallas", "lat": 32.855231, "lng": -96.602486, "addr": "4845 Broadway Boulevard, Garland", "web": "", "osm": "way/267161906"},
-  {"name": "West Garland Library", "region": "Dallas", "lat": 32.91731, "lng": -96.691291, "addr": "3921 West Walnut Street, Garland", "web": "", "osm": "node/14062734814"},
-  {"name": "Josey Ranch Lake Library", "region": "Dallas", "lat": 32.970454, "lng": -96.893749, "addr": "1700 Keller Springs Road, Carrollton", "web": "https://www.cityofcarrollton.com/departments/departments-g-p/library/about/hours-locations", "osm": "way/424223526"},
-  {"name": "Grand Prairie Main Library", "region": "Dallas", "lat": 32.737543, "lng": -97.0174, "addr": "901 Conover Drive, Grand Prairie", "web": "https://www.gptx.org/index.aspx?page=1742", "osm": "way/318073112"},
-  {"name": "Irving Public Library West Branch", "region": "Dallas", "lat": 32.84553, "lng": -97.010514, "addr": "4444 West Rochelle Road, Irving", "web": "", "osm": "way/120100839"},
-  {"name": "Coppell Cozby Library & Community Commons", "region": "Dallas", "lat": 32.973567, "lng": -96.989645, "addr": "177 Heartz Road, Coppell", "web": "https://www.coppelltx.gov/184/Cozby-Library-Community-Commons---Old-UR", "osm": "way/742633994"},
-  {"name": "Valley Ranch Library", "region": "Dallas", "lat": 32.934061, "lng": -96.950629, "addr": "401 Cimarron Trail, Irving", "web": "https://www.cityofirving.org/2148/Valley-Ranch-Library", "osm": "way/111962329"},
-  {"name": "Manske Library", "region": "Dallas", "lat": 32.933444, "lng": -96.873755, "addr": "13613 Webb Chapel Road, Farmers Branch", "web": "https://www.farmersbranchtx.gov/1553/Library", "osm": "way/427136336"},
-  {"name": "Cowan-Blakley Memorial Library", "region": "Dallas", "lat": 32.846781, "lng": -96.920141, "addr": "Haggar Circle, Irving", "web": "", "osm": "way/562552495"},
-  {"name": "Montgomery Library", "region": "Dallas", "lat": 32.942096, "lng": -96.842624, "addr": "Greenhill School Road, Addison", "web": "", "osm": "way/427336510"},
-  {"name": "East Branch Library", "region": "Dallas", "lat": 32.809905, "lng": -96.934054, "addr": "440 South Nursery Road, Irving", "web": "https://www.cityofirving.org/2147/East-Branch-Library", "osm": "node/6336538842"},
-  {"name": "Frisco Public Library", "region": "Dallas", "lat": 33.144678, "lng": -96.83502, "addr": "8000 Dallas Parkway, Frisco", "web": "https://www.friscolibrary.com/", "osm": "way/280234056"},
-  {"name": "John & Judy Gay Library", "region": "Dallas", "lat": 33.173663, "lng": -96.706115, "addr": "6861 Eldorado Parkway, McKinney", "web": "https://www.mckinneytexas.org/Index.aspx?NID=116", "osm": "way/548004890"},
-  {"name": "Roy & Helen Hall Memorial Library", "region": "Dallas", "lat": 33.19964, "lng": -96.615591, "addr": "North Tennessee Street, McKinney", "web": "", "osm": "way/495927310"},
-  {"name": "Richardson Public Library", "region": "Dallas", "lat": 32.960178, "lng": -96.732094, "addr": "421 West Arapaho Road, Richardson", "web": "https://www.cor.net/departments/public-library", "osm": "way/376177516"},
-  {"name": "Mesquite Public Library", "region": "Dallas", "lat": 32.775002, "lng": -96.601786, "addr": "300 West Grubb Drive, Mesquite", "web": "", "osm": "way/663344624"},
-  {"name": "Mesquite Public Library North Branch", "region": "Dallas", "lat": 32.829205, "lng": -96.638598, "addr": "2600 Oates Drive, Mesquite", "web": "", "osm": "way/640595976"},
-  {"name": "Carrollton Public Library - Hebron & Josey", "region": "Dallas", "lat": 33.026132, "lng": -96.8834, "addr": "4220 North Josey Lane, Carrollton", "web": "https://www.cityofcarrollton.com/departments/departments-g-p/library", "osm": "way/158591352"},
-  {"name": "Allen Public Library", "region": "Dallas", "lat": 33.099541, "lng": -96.651596, "addr": "800 Leading Lane, Allen", "web": "", "osm": "relation/8227979"},
-  {"name": "Allen Public Library", "region": "Dallas", "lat": 33.105449, "lng": -96.670629, "addr": "300 North Allen Drive, Allen", "web": "https://www.allenlibrary.org/", "osm": "way/374166549"},
-  {"name": "Fondren Library SMU", "region": "Dallas", "lat": 32.844538, "lng": -96.783433, "addr": "3225 Daniel Avenue, University Park", "web": "", "osm": "way/443633904"},
-  {"name": "J. Erik Jonsson Central Library", "region": "Dallas", "lat": 32.778427, "lng": -96.797091, "addr": "1515 Young Street, Dallas", "web": "", "osm": "way/28015805"},
-  {"name": "Collin College Spring Creek Campus Library", "region": "Dallas", "lat": 33.049586, "lng": -96.678235, "addr": "Sewell Drive, Plano", "web": "", "osm": "way/518663907"},
-  {"name": "Harrington Library", "region": "Dallas", "lat": 33.024544, "lng": -96.692669, "addr": "1501 18th Street, Plano", "web": "https://www.plano.gov/harrington-library", "osm": "way/479586163"},
-  {"name": "Central Library", "region": "Dallas", "lat": 32.914858, "lng": -96.638374, "addr": "Austin Street, Garland", "web": "", "osm": "way/645152121"},
-  {"name": "Irving Public Library Central Branch", "region": "Dallas", "lat": 32.814253, "lng": -96.954028, "addr": "801 West Irving Boulevard, Irving", "web": "", "osm": "way/641701339"},
-  {"name": "South Irving Library", "region": "Dallas", "lat": 32.812836, "lng": -96.953107, "addr": "601 Schulze Drive, Irving", "web": "https://www.cityofirving.org/2984/South-Irving-Library", "osm": "way/510709776"},
-  {"name": "Lewisville Library", "region": "Dallas", "lat": 33.043603, "lng": -97.023316, "addr": "1197 Civic Circle, Lewisville", "web": "https://library.cityoflewisville.com", "osm": "way/665633245"},
-  {"name": "Rita & Truett Smith Public Library", "region": "Dallas", "lat": 33.015243, "lng": -96.567664, "addr": "300 North Country Club Road, Wylie", "web": "https://www.wylietexas.gov/library.php", "osm": "way/557451358"},
-  {"name": "Forest Green Branch Library", "region": "Dallas", "lat": 32.906763, "lng": -96.748434, "addr": "9619 Greenville Avenue, Dallas", "web": "", "osm": "way/1280002109"},
-  {"name": "Duncanville Public Library", "region": "Dallas", "lat": 32.646492, "lng": -96.907891, "addr": "South Main Street, Duncanville", "web": "", "osm": "way/469793934"},
-  {"name": "Duncanville Public Library", "region": "Dallas", "lat": 32.649396, "lng": -96.907391, "addr": "East Nance Street, Duncanville", "web": "http://www.duncanville.com/departments/library/", "osm": "node/4631438787"},
-  {"name": "The Colony Public Library", "region": "Dallas", "lat": 33.097088, "lng": -96.891507, "addr": "6800 Main Street, The Colony", "web": "", "osm": "way/256856588"},
-  {"name": "Rowlett Public Library", "region": "Dallas", "lat": 32.902796, "lng": -96.564491, "addr": "3900 Main Street, Rowlett", "web": "", "osm": "node/6147832298"},
-  {"name": "Sachse Public Library", "region": "Dallas", "lat": 32.974653, "lng": -96.584858, "addr": "3815 Sachse Road, Sachse", "web": "", "osm": "way/505423587"},
-  {"name": "Balch Springs Library", "region": "Dallas", "lat": 32.718779, "lng": -96.61187, "addr": "12450 Elam Road, Balch Springs", "web": "", "osm": "way/673938952"},
-  {"name": "Little Elm Public Library", "region": "Dallas", "lat": 33.157971, "lng": -96.939917, "addr": "100 West Eldorado Parkway, Little Elm", "web": "", "osm": "node/4724327279"},
-  {"name": "Doris Padgett Public Library", "region": "Dallas", "lat": 32.815052, "lng": -96.591642, "addr": "402 Tower Place", "web": "", "osm": "way/1169752179"},
-  {"name": "Southwest Regional Library", "region": "Fort Worth", "lat": 32.689099, "lng": -97.394129, "addr": "4001 Library Lane, Fort Worth", "web": "", "osm": "way/152712107"},
-  {"name": "East Regional Library", "region": "Fort Worth", "lat": 32.761073, "lng": -97.223571, "addr": "6301 Bridge Street, Fort Worth", "web": "", "osm": "way/480703489"},
-  {"name": "West Library", "region": "Fort Worth", "lat": 32.732929, "lng": -97.279559, "addr": "Avenue B, Fort Worth", "web": "", "osm": "way/286206098"},
-  {"name": "Golden Triangle Branch Library", "region": "Fort Worth", "lat": 32.931137, "lng": -97.292259, "addr": "4264 Golden Triangle Boulevard, Fort Worth", "web": "", "osm": "way/1383030183"},
-  {"name": "Watauga Public Library", "region": "Fort Worth", "lat": 32.875758, "lng": -97.255641, "addr": "7109 Whitley Road, Watauga", "web": "", "osm": "way/670752858"},
-  {"name": "Ella Mae Shamblee Library", "region": "Fort Worth", "lat": 32.73318, "lng": -97.318638, "addr": "1062 Evans Avenue, Fort Worth", "web": "https://www.fortworthtexas.gov/departments/library/branches/lib-loc-ems", "osm": "way/497275971"},
-  {"name": "Northwest Branch Library", "region": "Fort Worth", "lat": 32.851747, "lng": -97.402202, "addr": "6228 Crystal Lake Drive, Fort Worth", "web": "", "osm": "way/505922099"},
-  {"name": "East Berry Library", "region": "Fort Worth", "lat": 32.713229, "lng": -97.259531, "addr": "4300 East Berry Street, Fort Worth", "web": "https://www.fortworthtexas.gov/departments/library/branches/lib-loc-eby", "osm": "way/504050726"},
-  {"name": "Summerglen Branch Library", "region": "Fort Worth", "lat": 32.873977, "lng": -97.292554, "addr": "4205 Basswood Boulevard, Fort Worth", "web": "", "osm": "way/49342307"},
-  {"name": "Diamond Hill/Jarvis Branch Library", "region": "Fort Worth", "lat": 32.808821, "lng": -97.339058, "addr": "1300 Northeast 35th Street, Fort Worth", "web": "", "osm": "way/56027535"},
-  {"name": "Meadowbrook Library", "region": "Fort Worth", "lat": 32.739408, "lng": -97.232816, "addr": "2800 Stark Street, Fort Worth", "web": "https://www.fortworthtexas.gov/departments/library/branches/lib-loc-mbk", "osm": "way/498354226"},
-  {"name": "Fort Worth Public Library - Clifford Crossing", "region": "Fort Worth", "lat": 32.766098, "lng": -97.479646, "addr": "Clifford Street, Fort Worth", "web": "", "osm": "node/13265575767"},
-  {"name": "Southeast Branch Library", "region": "Fort Worth", "lat": 32.65256, "lng": -97.096234, "addr": "900 Southeast Green Oaks Boulevard, Arlington", "web": "https://www.arlingtonlibrary.org", "osm": "way/448235614"},
-  {"name": "Arlington Public Library-Southwest Branch", "region": "Fort Worth", "lat": 32.659549, "lng": -97.161122, "addr": "Southwest Green Oaks Boulevard, Arlington", "web": "", "osm": "way/671689084"},
-  {"name": "Arlington Public Library", "region": "Fort Worth", "lat": 32.683153, "lng": -97.195937, "addr": "4000 West Green Oaks Boulevard, Arlington", "web": "", "osm": "way/334107108"},
-  {"name": "Arlington Public Library - Woodland West Branch", "region": "Fort Worth", "lat": 32.722148, "lng": -97.152734, "addr": "2837 West Park Row Drive, Arlington", "web": "https://arlingtonlibrary.org/", "osm": "way/425276964"},
-  {"name": "Northeast Branch Library", "region": "Fort Worth", "lat": 32.774519, "lng": -97.079587, "addr": "Brown Boulevard, Arlington", "web": "", "osm": "node/9206314021"},
-  {"name": "West Campus Library", "region": "Fort Worth", "lat": 32.731609, "lng": -97.115771, "addr": "West Nedderman Drive, Arlington", "web": "", "osm": "node/10099246826"},
-  {"name": "George W. Hawkes Downtown Library", "region": "Fort Worth", "lat": 32.736868, "lng": -97.107591, "addr": "West Main Street, Arlington", "web": "", "osm": "node/9641589917"},
-  {"name": "UTA Central Library", "region": "Fort Worth", "lat": 32.729703, "lng": -97.112952, "addr": "701 South Nedderman Drive, Arlington", "web": "", "osm": "node/14002571600"},
-  {"name": "Mary Lib Saleh Euless Public Library", "region": "Fort Worth", "lat": 32.839088, "lng": -97.093511, "addr": "201 North Ector Drive, Euless", "web": "", "osm": "way/652913720"},
-  {"name": "Judith J. Carrier Library", "region": "Fort Worth", "lat": 32.639018, "lng": -97.071651, "addr": "2100 Southeast Parkway, Arlington", "web": "", "osm": "node/13238992574"},
-  {"name": "Grapevine Public Library", "region": "Fort Worth", "lat": 32.929586, "lng": -97.075924, "addr": "1201 Municipal Way, Grapevine", "web": "https://www.grapevinetexas.gov/1854/Library", "osm": "way/612765686"},
-  {"name": "Southlake Public Library", "region": "Fort Worth", "lat": 32.942899, "lng": -97.131462, "addr": "State Street, Southlake", "web": "", "osm": "node/4304622599"},
-  {"name": "Mansfield Public Library", "region": "Fort Worth", "lat": 32.564709, "lng": -97.123971, "addr": "104 South Wisteria Street, Mansfield", "web": "", "osm": "way/691315532"},
-  {"name": "Keller Library", "region": "Fort Worth", "lat": 32.940908, "lng": -97.238884, "addr": "Johnson Road, Keller", "web": "", "osm": "way/549461074"},
-  {"name": "Bedford Public Library", "region": "Fort Worth", "lat": 32.8461, "lng": -97.141773, "addr": "2424 Forest Ridge Drive, Bedford", "web": "https://bedfordlibrary.org/", "osm": "way/438378266"},
-  {"name": "North Richland Hills Library", "region": "Fort Worth", "lat": 32.855102, "lng": -97.192457, "addr": "9015 Grand Avenue, North Richland Hills", "web": "https://library.nrhtx.com/", "osm": "way/13990575"},
-  {"name": "J. Ardis Bell Library, TCC Northeast Campus", "region": "Fort Worth", "lat": 32.846432, "lng": -97.191818, "addr": "828 Harwood Road, North Richland Hills", "web": "", "osm": "node/10195537818"},
-  {"name": "Hurst Public Library", "region": "Fort Worth", "lat": 32.826201, "lng": -97.187155, "addr": "901 Precinct Line Road, Hurst", "web": "https://www.hursttx.gov/residents/library", "osm": "way/591142954"},
-  {"name": "Colleyville Public Library", "region": "Fort Worth", "lat": 32.885291, "lng": -97.157076, "addr": "110 Main Street, Colleyville", "web": "https://www.colleyvillelibrary.com/", "osm": "way/713504088"},
-  {"name": "Roanoke Library", "region": "Fort Worth", "lat": 32.995588, "lng": -97.227713, "addr": "Lamar Street, Roanoke", "web": "", "osm": "way/766785178"},
-  {"name": "Haltom City Library", "region": "Fort Worth", "lat": 32.833503, "lng": -97.272908, "addr": "4809 Haltom Road, Haltom City", "web": "https://www.haltomcitytx.com/177/Library", "osm": "way/670588988"},
-  {"name": "Benbrook Public Library", "region": "Fort Worth", "lat": 32.679372, "lng": -97.451072, "addr": "1065 Mercedes Street, Benbrook", "web": "https://www.benbrooklibrary.org/", "osm": "way/672388925"},
-  {"name": "Saginaw Public Library", "region": "Fort Worth", "lat": 32.857982, "lng": -97.370583, "addr": "355 West McLeroy Boulevard, Saginaw", "web": "", "osm": "way/672418274"},
-  {"name": "Billie Hamilton Memorial Library", "region": "Fort Worth", "lat": 32.858871, "lng": -97.342579, "addr": "301 South Blue Mound Road", "web": "", "osm": "way/51208283"},
-  {"name": "White Settlement Library", "region": "Fort Worth", "lat": 32.759309, "lng": -97.460351, "addr": "8215 White Settlement Road, White Settlement", "web": "", "osm": "way/709055961"},
-  {"name": "Haslet Public Library", "region": "Fort Worth", "lat": 32.974069, "lng": -97.348829, "addr": "100 Gammil Street", "web": "", "osm": "way/691820630"},
-  {"name": "Richland Hills Public Library", "region": "Fort Worth", "lat": 32.806981, "lng": -97.237476, "addr": "6724 Rena Drive", "web": "", "osm": "way/678170246"},
-  {"name": "Perry-Castañeda Library", "region": "Austin", "lat": 30.282757, "lng": -97.738208, "addr": "101 East 21st Street, Austin", "web": "https://www.lib.utexas.edu/visit-us/locations/pcl", "osm": "way/25795473"},
-  {"name": "Austin Central Library", "region": "Austin", "lat": 30.266016, "lng": -97.751706, "addr": "710 West Cesar Chavez Street, Austin", "web": "https://library.austintexas.gov/", "osm": "way/516271467"},
-  {"name": "Munday Library", "region": "Austin", "lat": 30.231098, "lng": -97.75744, "addr": "University Circle, Austin", "web": "https://library.stedwards.edu", "osm": "way/188589265"},
-  {"name": "Harrison Library", "region": "Austin", "lat": 30.292314, "lng": -97.732089, "addr": "606 Rathervue Place, Austin", "web": "", "osm": "way/382053055"},
-  {"name": "Austin Public Library - Ruiz Branch", "region": "Austin", "lat": 30.229844, "lng": -97.70709, "addr": "1600 Grove Boulevard, Austin", "web": "", "osm": "way/383809193"},
-  {"name": "Austin Public Library - Little Walnut Creek Branch", "region": "Austin", "lat": 30.363298, "lng": -97.69847, "addr": "835 West Rundberg Lane, Austin", "web": "", "osm": "way/381998143"},
-  {"name": "Austin Public Library - Twin Oaks Branch", "region": "Austin", "lat": 30.248676, "lng": -97.762454, "addr": "1800 South 5th Street, Austin", "web": "https://library.austintexas.gov/twin-oaks-branch", "osm": "way/382491744"},
-  {"name": "Austin Public Library - Yarborough Branch", "region": "Austin", "lat": 30.323461, "lng": -97.740728, "addr": "2200 Hancock Drive, Austin", "web": "", "osm": "way/42624302"},
-  {"name": "Austin Public Library - Manchaca Road Branch", "region": "Austin", "lat": 30.21664, "lng": -97.79732, "addr": "5500 Menchaca Road, Austin", "web": "", "osm": "way/382465172"},
-  {"name": "Austin Public Library - Austin History Center", "region": "Austin", "lat": 30.271714, "lng": -97.745891, "addr": "810 Guadalupe Street, Austin", "web": "https://library.austintexas.gov/ahc/about-us", "osm": "way/328649859"},
-  {"name": "Austin Public Library - John Gillum Branch", "region": "Austin", "lat": 30.362157, "lng": -97.730504, "addr": "2505 Steck Avenue, Austin", "web": "https://library.austintexas.gov/john-gillum-branch", "osm": "way/379207142"},
-  {"name": "Westbank Library", "region": "Austin", "lat": 30.274026, "lng": -97.811565, "addr": "1309 Westbank Drive", "web": "https://westbanklibrary.com/", "osm": "way/383359403"},
-  {"name": "Austin Public Library - Carver Branch", "region": "Austin", "lat": 30.269557, "lng": -97.724044, "addr": "1161 Angelina Street, Austin", "web": "", "osm": "way/382368504"},
-  {"name": "Austin Public Library - Willie Mae Kirk Branch", "region": "Austin", "lat": 30.273021, "lng": -97.699768, "addr": "3101 Oak Springs Drive, Austin", "web": "", "osm": "way/289804782"},
-  {"name": "Austin Public Library - Terrazas Branch", "region": "Austin", "lat": 30.259912, "lng": -97.733445, "addr": "1105 East Cesar Chavez Street, Austin", "web": "https://library.austintexas.gov/terrazas-branch", "osm": "way/379188695"},
-  {"name": "Austin Public Library - Old Quarry Branch", "region": "Austin", "lat": 30.353001, "lng": -97.755173, "addr": "7051 Village Center Drive, Austin", "web": "", "osm": "way/381814955"},
-  {"name": "Austin Public Library - Milwood Branch", "region": "Austin", "lat": 30.422389, "lng": -97.71623, "addr": "12500 Amherst Drive, Austin", "web": "https://library.austintexas.gov/", "osm": "way/383169397"},
-  {"name": "Austin Public Library - University Hills Branch", "region": "Austin", "lat": 30.308661, "lng": -97.666511, "addr": "4721 Loyola Lane, Austin", "web": "", "osm": "way/382013842"},
-  {"name": "Austin Public Library - Southeast Branch", "region": "Austin", "lat": 30.187605, "lng": -97.74193, "addr": "5803 Nuckols Crossing Road, Austin", "web": "", "osm": "way/901417377"},
-  {"name": "Austin Public Library - Hampton Branch at Oak Hill", "region": "Austin", "lat": 30.217605, "lng": -97.855009, "addr": "5125 Convict Hill Road, Austin", "web": "https://library.austintexas.gov/locations", "osm": "way/384041816"},
-  {"name": "Austin Public Library - Pleasant Hill Branch", "region": "Austin", "lat": 30.192237, "lng": -97.777179, "addr": "211 East William Cannon Drive, Austin", "web": "", "osm": "way/384246738"},
-  {"name": "Austin Public Library - Howson Branch", "region": "Austin", "lat": 30.298253, "lng": -97.767623, "addr": "2500 Exposition Boulevard, Austin", "web": "", "osm": "way/259807239"},
-  {"name": "Austin Public Library - Windsor Park Branch", "region": "Austin", "lat": 30.311664, "lng": -97.690216, "addr": "5833 Westminster Drive, Austin", "web": "", "osm": "way/382689840"},
-  {"name": "Austin Public Library - Cepeda Branch", "region": "Austin", "lat": 30.259048, "lng": -97.708872, "addr": "651 North Pleasant Valley Road, Austin", "web": "https://library.austintexas.gov/cepeda-branch", "osm": "way/379199990"},
-  {"name": "Austin Public Library - St. John Branch", "region": "Austin", "lat": 30.332052, "lng": -97.693723, "addr": "7500 Blessing Avenue, Austin", "web": "", "osm": "node/9956137736"},
-  {"name": "Pflugerville Public Library", "region": "Austin", "lat": 30.442431, "lng": -97.628996, "addr": "1008 10th Street, Pflugerville", "web": "https://www.pflugervilletx.gov/269/Library", "osm": "way/384444832"},
-  {"name": "Bee Cave Public Library", "region": "Austin", "lat": 30.308539, "lng": -97.939851, "addr": "4000 Galleria Parkway", "web": "https://library.beecavetexas.gov", "osm": "node/9891844033"},
-  {"name": "Wells Branch Community Library", "region": "Austin", "lat": 30.44573, "lng": -97.675612, "addr": "15001 Wells Port Drive, Austin", "web": "https://www.wblibrary.org/", "osm": "way/168381942"},
-  {"name": "Garfield Library", "region": "Austin", "lat": 30.187883, "lng": -97.560569, "addr": "Albert Brown Drive", "web": "", "osm": "node/2667102948"},
-  {"name": "Laura Bush Community Library", "region": "Austin", "lat": 30.315624, "lng": -97.871342, "addr": "9411 Bee Caves Road, Austin", "web": "https://westbanklibrary.com", "osm": "way/382483010"}
-];
-</script>
 <script>
 (function(){
 "use strict";
@@ -455,13 +319,13 @@ const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;"
 const isOutdoor=w=>/patio|outdoor|rooftop|terrace|garden|deck/i.test(w.setting||"");
 const telOf=s=>{const m=String(s||"").match(/\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}/);return m?m[0]:""};
 const mailOf=s=>{const m=String(s||"").match(/[\w.+-]+@[\w-]+\.[\w.-]+/);return m?m[0]:""};
-const dirUrl=p=>"https://www.google.com/maps/dir/?api=1&destination="+p.lat+","+p.lng;
-const MI=1609.344;
-const VIEWS={
-  All:[[29.95,-98.1],[33.35,-96.4]],
-  Dallas:[[32.6,-97.05],[33.2,-96.55]],
-  "Fort Worth":[[32.55,-97.5],[32.95,-97.05]],
-  Austin:[[30.13,-97.92],[30.45,-97.6]]
+const MI=1609.344, DESK=()=>window.innerWidth>=900;
+/* ---------- navigation links ---------- */
+const ll=p=>(+p.lat).toFixed(6)+","+(+p.lng).toFixed(6);
+const NAV={
+  google:p=>"https://www.google.com/maps/dir/?api=1&destination="+(p.navq?encodeURIComponent(p.navq):ll(p)),
+  waze:p=>p.navq?"https://waze.com/ul?q="+encodeURIComponent(p.navq)+"&navigate=yes":"https://waze.com/ul?ll="+ll(p)+"&navigate=yes",
+  apple:p=>"https://maps.apple.com/?daddr="+(p.navq?encodeURIComponent(p.navq):ll(p))
 };
 const ICON={
   cup:'<svg viewBox="0 0 24 24"><path d="M3 8h14v5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6V8zm14 1h1.5a3 3 0 0 1 0 6H17v-2h1.5a1 1 0 0 0 0-2H17V9zM6 2h2v4H6zm4 0h2v4h-2z"/></svg>',
@@ -471,71 +335,50 @@ const ICON={
   mic:'<svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4zm-7 9h2a5 5 0 0 0 10 0h2a7 7 0 0 1-6 6.9V21h3v2H8v-2h3v-3.1A7 7 0 0 1 5 11z"/></svg>',
   phone:'<svg viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.6 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.6 3.6a1 1 0 0 1-.25 1z"/></svg>',
   nav:'<svg viewBox="0 0 24 24"><path d="M21 3L3 10.5l7 2.5 2.5 7z"/></svg>',
-  web:'<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.9 6h-3a15 15 0 0 0-1.3-3.9A8 8 0 0 1 18.9 8zM12 4c.8 1.1 1.5 2.5 1.9 4h-3.8c.4-1.5 1.1-2.9 1.9-4zM4.3 14a8 8 0 0 1 0-4h3.4a16 16 0 0 0 0 4zm.8 2h3a15 15 0 0 0 1.3 3.9A8 8 0 0 1 5.1 16zm3-8h-3a8 8 0 0 1 4.3-3.9C8.8 5.3 8.4 6.6 8.1 8zM12 20c-.8-1.1-1.5-2.5-1.9-4h3.8c-.4 1.5-1.1 2.9-1.9 4zm2.3-6H9.7a14 14 0 0 1 0-4h4.6a14 14 0 0 1 0 4zm.3 5.9c.6-1.2 1-2.5 1.3-3.9h3a8 8 0 0 1-4.3 3.9zm1.7-5.9a16 16 0 0 0 0-4h3.4a8 8 0 0 1 0 4z"/></svg>',
-  mail:'<svg viewBox="0 0 24 24"><path d="M3 5h18v14H3zm2 2v.5l7 4.5 7-4.5V7z"/></svg>'
+  web:'<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2c.8 1.1 1.5 2.5 1.9 4h-3.8c.4-1.5 1.1-2.9 1.9-4zM4.3 14a8 8 0 0 1 0-4h3.4a16 16 0 0 0 0 4zm5.4 0a14 14 0 0 1 0-4h4.6a14 14 0 0 1 0 4zm6.6 0a16 16 0 0 0 0-4h3.4a8 8 0 0 1 0 4zM12 20c-.8-1.1-1.5-2.5-1.9-4h3.8c-.4 1.5-1.1 2.9-1.9 4z"/></svg>',
+  mail:'<svg viewBox="0 0 24 24"><path d="M3 5h18v14H3zm2 2v.5l7 4.5 7-4.5V7z"/></svg>',
+  heart:'<svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-9.6-9.2C.9 7.9 3 4 6.8 4c2.1 0 3.6 1.1 5.2 3 1.6-1.9 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3-2.1 4.6-9.6 9.2-9.6 9.2z"/></svg>',
+  share:'<svg viewBox="0 0 24 24"><path d="M18 16a3 3 0 0 0-2.4 1.2l-6.7-3.4a3 3 0 0 0 0-1.6l6.7-3.4A3 3 0 1 0 15 7l-6.7 3.4a3 3 0 1 0 0 3.2L15 17a3 3 0 1 0 3-1z"/></svg>',
+  apple:'<svg viewBox="0 0 24 24"><path d="M16.4 12.6c0-2.4 2-3.5 2-3.6a4.3 4.3 0 0 0-3.4-1.8c-1.4-.1-2.8.9-3.5.9s-1.9-.9-3.1-.8A4.6 4.6 0 0 0 4.5 9.7c-1.7 2.9-.4 7.2 1.2 9.6.8 1.2 1.7 2.4 3 2.4 1.2 0 1.6-.8 3.1-.8s1.8.8 3.1.8 2.1-1.2 2.9-2.4a10 10 0 0 0 1.3-2.7 4.1 4.1 0 0 1-2.7-4zM14.1 5.5A4 4 0 0 0 15 2.6a4.2 4.2 0 0 0-2.8 1.4 3.9 3.9 0 0 0-1 2.8 3.5 3.5 0 0 0 2.9-1.3z"/></svg>'
 };
 const glyph=w=>/library|bookstore/i.test(w.type)?ICON.book:/park/i.test(w.type)?ICON.tree:/bar/i.test(w.type)?ICON.glass:ICON.cup;
 
+/* ---------- local storage: favorites + notes ---------- */
+const KEY="wndr.saved.v1";
+let SAVE;
+try{SAVE=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){SAVE={}}
+SAVE.favs=SAVE.favs||{}; SAVE.notes=SAVE.notes||{};
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(SAVE))}catch(e){toast("Couldn't save: browser storage is full or blocked.")}};
+const snap=p=>({name:p.name,kind:p.kind,region:p.rid,area:p.area||"",lat:p.lat,lng:p.lng});
+const isFav=id=>!!SAVE.favs[id];
+const noteOf=id=>(SAVE.notes[id]&&SAVE.notes[id].text)||"";
+function toggleFav(id){
+  const p=SPOT[id]; if(SAVE.favs[id]) delete SAVE.favs[id]; else SAVE.favs[id]=Object.assign(snap(p||SAVE.notes[id]||{}),{t:Date.now()});
+  persist(); $$('.fav[data-id="'+id+'"]').forEach(b=>{b.classList.toggle("on",isFav(id));b.setAttribute("aria-pressed",isFav(id))});
+  toast(isFav(id)?"Saved to your favorites":"Removed from favorites"); updateCounts(); if(S.tab==="saved")render();
+}
+function setNote(id,text){
+  const p=SPOT[id]; text=text.replace(/\s+$/,"");
+  if(text) SAVE.notes[id]=Object.assign(snap(p),{text,t:Date.now()}); else delete SAVE.notes[id];
+  persist(); updateCounts();
+}
+const favBtn=id=>'<button class="fav'+(isFav(id)?" on":"")+'" data-id="'+esc(id)+'" aria-pressed="'+isFav(id)+'" aria-label="Save to favorites" title="Save to favorites">'+ICON.heart+'</button>';
+
 /* ---------- map + basemaps ---------- */
-const map=L.map("map",{zoomControl:true,tap:true});
+const map=L.map("map",{zoomControl:true,tap:true,minZoom:3});
 map.zoomControl.setPosition("bottomright");
-const osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+const attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+const osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:attr}).addTo(map);
 /* Calm + Night are the same OpenStreetMap tiles with a CSS tint (no API key needed). */
-const osmOpts=(cls)=>({maxZoom:19,className:cls,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
-const calm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",osmOpts("tint-calm"));
-const dark=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",osmOpts("tint-night"));
-const hot=L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",{maxZoom:19,subdomains:"abc",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles by <a href="https://www.hotosm.org/">HOT</a> hosted by <a href="https://openstreetmap.fr/">OSM France</a>'});
+const calm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,className:"tint-calm",attribution:attr});
+const dark=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,className:"tint-night",attribution:attr});
+const hot=L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",{maxZoom:19,subdomains:"abc",attribution:attr+', tiles by <a href="https://www.hotosm.org/">HOT</a> hosted by <a href="https://openstreetmap.fr/">OSM France</a>'});
 map.createPane("zones"); map.getPane("zones").style.zIndex=350;
 map.createPane("rings"); map.getPane("rings").style.zIndex=360; map.getPane("rings").style.pointerEvents="none";
 map.createPane("bounds"); map.getPane("bounds").style.zIndex=370;
 
-/* ---------- overlay: city boundaries ---------- */
-const BCOL={"Dallas":"#3f6e8c","Fort Worth":"#7a5c3a","Austin":"#5b7f4d"};
-const boundsLayer=L.geoJSON(BOUNDARIES,{pane:"bounds",interactive:false,style:f=>{const c=BCOL[f.properties.name]||"#6b6f7a";return{color:c,weight:BCOL[f.properties.name]?2.5:1.4,opacity:.75,dashArray:"7 6",fillColor:c,fillOpacity:BCOL[f.properties.name]?.10:.06}}});
-const labels=L.layerGroup();
-BOUNDARIES.features.forEach(f=>{const b=L.geoJSON(f).getBounds().getCenter();L.tooltip({permanent:true,direction:"center",className:"city-label",interactive:false}).setLatLng(b).setContent(esc(f.properties.name)).addTo(labels)});
-const boundsGroup=L.layerGroup([boundsLayer,labels]);
-
-/* ---------- overlay: chill zones (soft density from spot locations) ---------- */
-const zones=L.layerGroup();
-function drawZones(ws,ps){
-  zones.clearLayers();
-  ws.concat(ps).forEach(p=>{
-    [2600,1500,700].forEach((r,i)=>L.circle([p.lat,p.lng],{pane:"zones",radius:r,stroke:false,fillColor:i===2?"#e8a35a":"#f0b26b",fillOpacity:[.09,.10,.13][i],interactive:false}).addTo(zones));
-  });
-}
-
-/* ---------- overlay: 5-mile studio reach ---------- */
-const freeRings=L.layerGroup(), paidRings=L.layerGroup();
-PODS.forEach(p=>{
-  const free=p.cost==="Free";
-  L.circle([p.lat,p.lng],{pane:"rings",radius:5*MI,color:free?"#4f9a6a":"#c9893a",weight:1.5,opacity:.5,dashArray:free?null:"4 6",fillColor:free?"#5fb07c":"#d9a25a",fillOpacity:free?.09:.05,interactive:false}).addTo(free?freeRings:paidRings);
-});
-
-/* ---------- overlay: library branches (OSM) ---------- */
-const libLayer=L.layerGroup();
-LIBRARIES.forEach(l=>{
-  L.circleMarker([l.lat,l.lng],{radius:7,color:"#fff",weight:2,fillColor:"#5878a8",fillOpacity:.8}).bindPopup(
-    '<div class="pp"><b>'+esc(l.name)+'</b><div class="s">Library · OpenStreetMap data'+(l.addr?' · '+esc(l.addr):'')+'</div><div class="acts"><a href="'+dirUrl(l)+'" target="_blank" rel="noopener">Directions</a>'+(l.web?'<a href="'+esc(l.web)+'" target="_blank" rel="noopener">Website</a>':'')+'<a href="https://www.openstreetmap.org/'+esc(l.osm)+'" target="_blank" rel="noopener">OSM</a></div></div>').addTo(libLayer);
-});
-
-/* ---------- marker layers ---------- */
-const workLayer=L.layerGroup().addTo(map), podLayer=L.layerGroup().addTo(map);
-const markers={};
-function mkIcon(kind,p,sel){
-  const cls="pin "+kind+(kind==="pod"&&p.cost!=="Free"?" paid":"")+(sel?" sel":"");
-  return L.divIcon({className:"",html:'<div class="'+cls+'"><i>'+(kind==="pod"?ICON.mic:glyph(p))+'</i></div>',iconSize:[44,44],iconAnchor:[22,22],popupAnchor:[0,-16]});
-}
-function popupHtml(kind,p){
-  const tel=kind==="pod"?telOf(p.contact):telOf(p.phone);
-  return '<div class="pp"><b>'+esc(p.name)+'</b><div class="s">'+esc(kind==="pod"?(p.cost+" podcast space · "+p.area):(p.type+" · "+p.area))+'</div>'+
-    (kind==="pod"?'<div class="s" style="margin-top:4px">'+esc(p.rate)+'</div>':'')+
-    '<div class="acts"><a href="'+dirUrl(p)+'" target="_blank" rel="noopener">Directions</a>'+(tel?'<a href="tel:'+tel.replace(/[^\d]/g,"")+'">Call</a>':'')+(p.url?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener">Website</a>':'')+'</div></div>';
-}
-WORK.forEach(w=>{markers[w.id]=L.marker([w.lat,w.lng],{icon:mkIcon("work",w),title:w.name,riseOnHover:true}).bindPopup(popupHtml("work",w),{autoPan:true}).on("click",()=>openDetail("work",w.id,false))});
-PODS.forEach(p=>{markers[p.id]=L.marker([p.lat,p.lng],{icon:mkIcon("pod",p),title:p.name,riseOnHover:true,zIndexOffset:500}).bindPopup(popupHtml("pod",p),{autoPan:true}).on("click",()=>openDetail("pod",p.id,false))});
-
-/* ---------- layers control ---------- */
+const boundsGroup=L.layerGroup(), zones=L.layerGroup(), freeRings=L.layerGroup(), paidRings=L.layerGroup(), libLayer=L.layerGroup();
+const workLayer=L.layerGroup().addTo(map), podLayer=L.layerGroup().addTo(map), bubbles=L.layerGroup().addTo(map);
 const sw=c=>'<span class="sw" style="background:'+c+'"></span>';
 L.control.layers(
   {"OpenStreetMap":osm,"Calm (OSM, muted)":calm,"Night (OSM, dimmed)":dark,"Humanitarian (OSM France)":hot},
@@ -544,88 +387,228 @@ L.control.layers(
   {position:"topright",collapsed:true}).addTo(map);
 zones.addTo(map); boundsGroup.addTo(map); freeRings.addTo(map);
 
+/* ---------- regions + lazy loading ---------- */
+let IDX=null; const REG={}, GRP={}, LOADED={}, PENDING={}, SPOT={}, ID2REG={};
+let WORK=[], PODS=[];
+const markers={};
+function mkIcon(p,sel){
+  const cls="pin "+p.kind+(p.kind==="pod"&&p.cost!=="Free"?" paid":"")+(sel?" sel":"");
+  return L.divIcon({className:"",html:'<div class="'+cls+'"><i>'+(p.kind==="pod"?ICON.mic:glyph(p))+'</i></div>',iconSize:[44,44],iconAnchor:[22,22],popupAnchor:[0,-16]});
+}
+function popupHtml(p){
+  const tel=telOf(p.kind==="pod"?p.contact:p.phone);
+  return '<div class="pp"><b>'+esc(p.name)+'</b><div class="s">'+esc(p.kind==="pod"?(p.cost+" podcast space · "+p.area):(p.type+" · "+p.area))+'</div>'+
+    (p.kind==="pod"?'<div class="s" style="margin-top:4px">'+esc(p.rate)+'</div>':'')+
+    '<div class="acts"><a href="'+esc(NAV.google(p))+'" target="_blank" rel="noopener">Google</a><a href="'+esc(NAV.waze(p))+'" target="_blank" rel="noopener">Waze</a><a href="'+esc(NAV.apple(p))+'" target="_blank" rel="noopener">Apple</a>'+(tel?'<a href="tel:'+tel.replace(/[^\d]/g,"")+'">Call</a>':'')+'</div></div>';
+}
+const BCOL={"Dallas":"#3f6e8c","Fort Worth":"#7a5c3a","Austin":"#5b7f4d","Oklahoma City":"#8c3f5e","San Diego":"#2f6f8f","Santa Fe":"#8f5a2f","Taos":"#6d5a8f"};
+function ingest(d){
+  const rid=d.id;
+  d.work.forEach(w=>{w.rid=rid;SPOT[w.id]=w;WORK.push(w);markers[w.id]=L.marker([w.lat,w.lng],{icon:mkIcon(w),title:w.name,riseOnHover:true}).bindPopup(popupHtml(w),{autoPan:true}).on("click",()=>openDetail(w.id,false))});
+  d.pods.forEach(p=>{p.rid=rid;SPOT[p.id]=p;PODS.push(p);markers[p.id]=L.marker([p.lat,p.lng],{icon:mkIcon(p),title:p.name,riseOnHover:true,zIndexOffset:500}).bindPopup(popupHtml(p),{autoPan:true}).on("click",()=>openDetail(p.id,false));
+    const free=p.cost==="Free";
+    L.circle([p.lat,p.lng],{pane:"rings",radius:5*MI,color:free?"#4f9a6a":"#c9893a",weight:1.5,opacity:.5,dashArray:free?null:"4 6",fillColor:free?"#5fb07c":"#d9a25a",fillOpacity:free?.09:.05,interactive:false}).addTo(free?freeRings:paidRings)});
+  d.libs.forEach(l=>{L.circleMarker([l.lat,l.lng],{radius:7,color:"#fff",weight:2,fillColor:"#5878a8",fillOpacity:.8}).bindPopup('<div class="pp"><b>'+esc(l.name)+'</b><div class="s">Library · OpenStreetMap data'+(l.addr?' · '+esc(l.addr):'')+'</div><div class="acts"><a href="'+esc(NAV.google(l))+'" target="_blank" rel="noopener">Directions</a>'+(l.web?'<a href="'+esc(l.web)+'" target="_blank" rel="noopener">Website</a>':'')+'<a href="https://www.openstreetmap.org/'+esc(l.osm)+'" target="_blank" rel="noopener">OSM</a></div></div>').addTo(libLayer)});
+  L.geoJSON(d.bounds,{pane:"bounds",interactive:false,style:f=>{const c=BCOL[f.properties.name]||"#6b6f7a",main=!!BCOL[f.properties.name];return{color:c,weight:main?2.5:1.4,opacity:.75,dashArray:"7 6",fillColor:c,fillOpacity:main?.08:.05}}}).addTo(boundsGroup);
+  d.bounds.features.forEach(f=>{L.tooltip({permanent:true,direction:"center",className:"city-label",interactive:false}).setLatLng(L.geoJSON(f).getBounds().getCenter()).setContent(esc(f.properties.name)).addTo(boundsGroup)});
+  LOADED[rid]=true;
+}
+function loadRegion(rid){
+  if(LOADED[rid])return Promise.resolve();
+  if(PENDING[rid])return PENDING[rid];
+  const r=REG[rid]; if(!r)return Promise.resolve();
+  return PENDING[rid]=fetch(r.file).then(x=>{if(!x.ok)throw new Error(x.status);return x.json()}).then(d=>{ingest(d);delete PENDING[rid];refreshTypes();drawBubbles();render()})
+    .catch(e=>{delete PENDING[rid];toast("Couldn't load "+r.label+" ("+e.message+"). Check your connection.")});
+}
+const loadMany=ids=>Promise.all(ids.map(loadRegion));
+const regionsOf=c=>c==="all"?Object.keys(REG):GRP[c]?GRP[c].regions:REG[c]?[c]:[];
+const viewOf=c=>{const ids=regionsOf(c);let b=null;ids.forEach(i=>{const v=L.latLngBounds(REG[i].view);b=b?b.extend(v):v});return b};
+function loadInView(){
+  if(!IDX||map.getZoom()<8)return;
+  const vb=map.getBounds();
+  Object.values(REG).forEach(r=>{if(!LOADED[r.id]&&vb.intersects(L.latLngBounds(r.load)))loadRegion(r.id)});
+}
+function drawBubbles(){
+  bubbles.clearLayers(); if(!IDX||map.getZoom()>=9)return;
+  // at low zoom, merge regions that would overlap into one bubble
+  const pts=[];
+  IDX.regions.forEach(r=>{const p=map.latLngToLayerPoint(r.center);const near=pts.find(q=>q.p.distanceTo(p)<70);if(near){near.rs.push(r)}else pts.push({p,rs:[r]})});
+  pts.forEach(g=>{
+    const w=g.rs.reduce((a,r)=>a+r.counts.work,0), pc=g.rs.reduce((a,r)=>a+r.counts.pod,0);
+    const nnm=g.rs.length>1&&g.rs.every(r=>r.group==="nnm");
+    const lab=g.rs.length===1?g.rs[0].label:nnm?"Northern NM":g.rs.length===2?g.rs[0].label+" · "+g.rs[1].label:g.rs[0].label+" +"+(g.rs.length-1)+" more";
+    const ll=g.rs.length>1?map.layerPointToLatLng(g.p):g.rs[0].center;
+    const target=g.rs.length>1?(g.rs[0].group==="nnm"&&g.rs.every(r=>r.group==="nnm")?"northern-nm":"multi:"+g.rs.map(r=>r.id).join(",")):g.rs[0].id;
+    L.marker(ll,{icon:L.divIcon({className:"",html:'<div class="rbub"><b>'+esc(lab)+'</b><span>'+w+' work · '+pc+' podcast</span></div>',iconSize:[0,0]}),keyboard:true,title:lab})
+      .on("click",()=>{if(target.startsWith("multi:")){const ids=target.slice(6).split(",");let b=null;ids.forEach(i=>{const v=L.latLngBounds(REG[i].view);b=b?b.extend(v):v});map.flyToBounds(b,fitOpts());}else setCity(target)}).addTo(bubbles);
+  });
+}
+map.on("moveend",()=>{loadInView()});
+let lastLow=null;
+map.on("zoomend",()=>{drawBubbles();const low=map.getZoom()<7;if(low!==lastLow){lastLow=low;if(IDX)render()}});
+
 /* ---------- state + filters ---------- */
-const S={city:"All",tab:"work",q:"",type:"All",cost:"All",out:false,me:null,sel:null};
-const types=["All"].concat(Array.from(new Set(WORK.map(w=>w.type))).sort());
-$("#fType").innerHTML=types.map(t=>'<option value="'+esc(t)+'">'+(t==="All"?"All types":esc(t))+' ('+(t==="All"?WORK.length:WORK.filter(w=>w.type===t).length)+')</option>').join("");
-const hit=(o,q)=>!q||Object.values(o).some(v=>typeof v==="string"&&v.toLowerCase().includes(q));
+const S={city:"dallas",tab:"work",q:"",type:"All",cost:"All",out:false,me:null,sel:null};
+function refreshTypes(){
+  const types=["All"].concat(Array.from(new Set(WORK.map(w=>w.type))).sort());
+  if(S.type!=="All"&&!types.includes(S.type))types.push(S.type);
+  $("#fType").innerHTML=types.map(t=>'<option value="'+esc(t)+'">'+(t==="All"?"All types":esc(t))+' ('+(t==="All"?WORK.length:WORK.filter(w=>w.type===t).length)+')</option>').join("");
+  $("#fType").value=S.type;
+}
+const hit=(o,q)=>!q||Object.values(o).some(v=>typeof v==="string"&&v.toLowerCase().includes(q))||noteOf(o.id).toLowerCase().includes(q);
 const distKm=p=>S.me?map.distance(S.me,[p.lat,p.lng])/1000:null;
+const inCity=p=>S.q.trim()?true:(S.city==="all"||regionsOf(S.city).includes(p.rid));
 function filtered(){
   const q=S.q.trim().toLowerCase();
-  let ws=WORK.filter(w=>(S.city==="All"||w.region===S.city)&&(S.type==="All"||w.type===S.type)&&(!S.out||isOutdoor(w))&&hit(w,q));
-  let ps=PODS.filter(p=>(S.city==="All"||p.region===S.city)&&(S.cost==="All"||p.cost===S.cost)&&hit(p,q));
-  if(S.me){const by=(a,b)=>distKm(a)-distKm(b);ws.sort(by);ps.sort(by)}
+  let ws=WORK.filter(w=>inCity(w)&&(S.type==="All"||w.type===S.type)&&(!S.out||isOutdoor(w))&&hit(w,q));
+  let ps=PODS.filter(p=>inCity(p)&&(S.cost==="All"||p.cost===S.cost)&&hit(p,q));
+  const by=S.me?(a,b)=>distKm(a)-distKm(b):null;
+  if(by){ws.sort(by);ps.sort(by)}
   return{ws,ps};
 }
+function savedList(){
+  const ids=Array.from(new Set(Object.keys(SAVE.favs).concat(Object.keys(SAVE.notes))));
+  const q=S.q.trim().toLowerCase();
+  let rows=ids.map(id=>Object.assign({id},SAVE.favs[id]||{},SAVE.notes[id]||{},SPOT[id]?{full:SPOT[id]}:{})).filter(r=>!q||[r.name,r.area,r.region,r.text,r.full&&r.full.vibe].some(v=>v&&String(v).toLowerCase().includes(q)));
+  if(S.me)rows.sort((a,b)=>distKm(a)-distKm(b)); else rows.sort((a,b)=>(SAVE.favs[b.id]?1:0)-(SAVE.favs[a.id]?1:0)||(b.t||0)-(a.t||0));
+  return rows;
+}
+function updateCounts(){
+  const n=new Set(Object.keys(SAVE.favs).concat(Object.keys(SAVE.notes))).size;
+  $("#cSaved").textContent=n?"("+n+")":"";
+}
+const cityLabel=c=>c==="all"?"All regions":GRP[c]?GRP[c].label:REG[c]?REG[c].label+(REG[c].state?", "+REG[c].state:""):c;
+const fmtD=p=>{const d=distKm(p);return d==null?"":(d/1.609).toFixed(d<16?1:0)+" mi"};
 function render(){
   const {ws,ps}=filtered();
   workLayer.clearLayers();podLayer.clearLayers();
-  ws.forEach(w=>workLayer.addLayer(markers[w.id]));ps.forEach(p=>podLayer.addLayer(markers[p.id]));
-  drawZones(ws,ps);
-  $("#cWork").textContent="("+ws.length+")";$("#cPod").textContent="("+ps.length+")";
+  zones.clearLayers();
+  const lowZ=map.getZoom()<7; // zoomed far out: region bubbles instead of pins
+  if(!lowZ){ws.forEach(w=>workLayer.addLayer(markers[w.id]));ps.forEach(p=>podLayer.addLayer(markers[p.id]));}
+  if(S.sel&&lowZ&&markers[S.sel])(SPOT[S.sel].kind==="work"?workLayer:podLayer).addLayer(markers[S.sel]);
+  if(!lowZ)ws.concat(ps).forEach(p=>[2600,1500,700].forEach((r,i)=>L.circle([p.lat,p.lng],{pane:"zones",radius:r,stroke:false,fillColor:i===2?"#e8a35a":"#f0b26b",fillOpacity:[.09,.10,.13][i],interactive:false}).addTo(zones)));
+  $("#cWork").textContent="("+ws.length+")";$("#cPod").textContent="("+ps.length+")";updateCounts();
   const pf=ps.filter(p=>p.cost==="Free").length;
-  $("#summary").textContent=(S.city==="All"?"DFW + Austin":S.city)+" · "+ws.length+" work spots · "+ps.length+" podcast spaces ("+pf+" free, "+(ps.length-pf)+" paid)"+(S.me?" · sorted by distance":"");
+  const pend=S.city==="all"?0:regionsOf(S.city).filter(i=>!LOADED[i]).length;
+  $("#summary").textContent=(S.q.trim()?"Search: all regions":S.city==="all"?"All loaded regions ("+Object.keys(LOADED).length+" of "+Object.keys(REG).length+")":cityLabel(S.city))+" · "+ws.length+" work · "+ps.length+" podcast ("+pf+" free, "+(ps.length-pf)+" paid)"+(S.me?" · by distance":"")+(pend&&!S.q.trim()?" · loading…":"");
+  if($("#detail").classList.contains("open"))return;
+  let h="";
+  if(S.tab==="saved"){
+    const rows=savedList();
+    h+='<div class="savedbar"><button id="bExport">Export</button><button id="bImport">Import</button><span class="hint">Hearts and notes live only in this browser. Export saves them as a .json file; Import merges a file back in.</span></div>';
+    h+=rows.map(r=>{const p=r.full||r;const kind=p.kind||r.kind;return '<div class="item" data-id="'+esc(r.id)+'"><span class="b" style="background:'+(kind==="pod"?"var(--pod)":"var(--work)")+'"></span><div style="min-width:0;flex:1"><div class="n">'+esc(p.name||r.name)+'</div><div class="m">'+esc(kind==="pod"?"Podcast space":(p.type||"Work spot"))+' · '+esc(p.area||r.area||"")+' · '+esc((REG[r.region]||REG[p.rid]||{}).label||"")+'</div>'+(noteOf(r.id)?'<div class="nt">✎ '+esc(noteOf(r.id))+'</div>':'')+'</div><div class="r">'+favBtn(r.id)+'<span class="d">'+fmtD(r)+'</span></div></div>'}).join("");
+    if(!rows.length)h+='<div class="empty">'+(S.q.trim()?'No saved spots match “'+esc(S.q)+'”.':'Nothing saved yet. Tap the ♥ on any spot to keep it here, or write a note on its details page.')+'</div>';
+    $("#list").innerHTML=h;
+    $("#bExport").onclick=exportSaved; $("#bImport").onclick=()=>$("#importFile").click();
+    return;
+  }
   const rows=S.tab==="work"?ws:ps;
-  const fmt=p=>{const d=distKm(p);return d==null?"":(d/1.609).toFixed(d<16?1:0)+" mi"};
-  let h=rows.map(p=>S.tab==="work"
-    ?'<div class="item" data-k="work" data-id="'+p.id+'"><span class="b" style="background:var(--work)"></span><div><div class="n">'+esc(p.name)+'</div><div class="m">'+esc(p.type)+' · '+esc(p.area)+' · '+esc(p.region)+'</div><div class="v">'+(isOutdoor(p)?'<span class="tag out">'+esc(p.setting)+'</span>':'')+esc(p.vibe)+'</div></div><span class="d">'+fmt(p)+'</span></div>'
-    :'<div class="item" data-k="pod" data-id="'+p.id+'"><span class="b" style="background:var(--pod)"></span><div><div class="n">'+esc(p.name)+'</div><div class="m">'+esc(p.area)+' · '+esc(p.region)+'</div><div class="v"><span class="tag '+(p.cost==="Free"?"free":"paid")+'">'+esc(p.cost)+'</span>'+esc(p.rate)+'</div></div><span class="d">'+fmt(p)+'</span></div>').join("");
-  if(!rows.length)h='<div class="empty">Nothing matches these filters. Try “Reset all” in Filters, or another city.</div>';
+  h=rows.map(p=>{const nt=noteOf(p.id);return '<div class="item" data-id="'+esc(p.id)+'"><span class="b" style="background:'+(p.kind==="pod"?"var(--pod)":"var(--work)")+'"></span><div style="min-width:0;flex:1"><div class="n">'+esc(p.name)+'</div><div class="m">'+(p.kind==="work"?esc(p.type)+' · ':'')+esc(p.area)+' · '+esc(REG[p.rid].label)+'</div><div class="v">'+
+    (p.kind==="work"?(isOutdoor(p)?'<span class="tag out">'+esc(p.setting)+'</span>':'')+esc(p.vibe):'<span class="tag '+(p.cost==="Free"?"free":"paid")+'">'+esc(p.cost)+'</span>'+esc(p.rate))+'</div>'+(nt?'<div class="nt">✎ '+esc(nt)+'</div>':'')+'</div><div class="r">'+favBtn(p.id)+'<span class="d">'+fmtD(p)+'</span></div></div>'}).join("");
+  if(!rows.length)h=pend&&!S.q.trim()?'<div class="loading">Loading '+esc(cityLabel(S.city))+'…</div>':'<div class="empty">'+(S.tab==="pod"&&!S.q.trim()&&S.cost==="All"?'No podcast spaces with a public address were found here yet. See “Before you go” below.':'Nothing matches. Try “Reset all” in Filters, or another region.')+'</div>';
   h+='<div id="legend"><span>'+sw("var(--work)")+'Work spot</span><span>'+sw("var(--pod)")+'Free studio</span><span><span class="sw" style="background:#fff;border:2px solid var(--pod)"></span>Paid studio</span><span>'+sw("#f0b26b")+'Chill zone</span><span>'+sw("#5fb07c")+'5-mi free reach</span></div>';
   h+=notesHtml();
   $("#list").innerHTML=h;
 }
 function notesHtml(){
-  const srcs={};WORK.forEach(w=>{if(w.source)srcs[w.source]=w.sourceName});
-  return '<div class="notes"><h4>Before you go</h4><ul>'+CAVEATS.map(c=>'<li>'+esc(c)+'</li>').join("")+'</ul><h4>Sources</h4><ul>'+
-    Object.keys(srcs).map(u=>'<li><a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(srcs[u])+'</a></li>').join("")+
-    '</ul><p style="margin-top:12px">Links checked '+CHECKED+'. Map data © OpenStreetMap contributors. Basemap tiles: OpenStreetMap (Calm and Night are OSM tiles with a color tint) and OSM France Humanitarian. Boundaries and library points from OpenStreetMap via Nominatim.</p><p style="margin-top:8px">WNDR is presented by <b>Chambers Creations, LLC</b>.</p></div>';
+  const ids=S.q.trim()?Object.keys(LOADED):regionsOf(S.city);
+  const srcs={};WORK.forEach(w=>{if(w.source&&ids.includes(w.rid))srcs[w.source]=w.sourceName});
+  const cav=CAVEATS.filter(c=>!c.r||ids.includes(c.r)||(c.r==="red-river"&&ids.includes("angel-fire")));
+  return '<div class="notes"><h4>Before you go</h4><ul>'+cav.map(c=>'<li>'+esc(c.t)+'</li>').join("")+'</ul>'+(Object.keys(srcs).length?'<h4>Sources</h4><ul>'+
+    Object.keys(srcs).map(u=>'<li><a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(srcs[u]||u)+'</a></li>').join("")+'</ul>':'')+
+    '<p style="margin-top:12px">Links checked '+esc(IDX?IDX.checked:CHECKED)+' (DFW and Austin on Nov 12, 2026). Map data © OpenStreetMap contributors. Basemap tiles: OpenStreetMap (Calm and Night are OSM tiles with a color tint) and OSM France Humanitarian. Boundaries and library points from OpenStreetMap via Nominatim; coordinates from the US Census geocoder or OpenStreetMap.</p><p style="margin-top:8px">WNDR is presented by <b>Chambers Creations, LLC</b>.</p></div>';
 }
 
 /* ---------- detail ---------- */
 function act(href,label,icon,alt,ext){return '<a class="act'+(alt?" alt":"")+'" href="'+esc(href)+'"'+(ext?' target="_blank" rel="noopener"':'')+'>'+icon+label+'</a>'}
 function prop(k,v){return v?'<dt>'+k+'</dt><dd>'+v+'</dd>':''}
-function openDetail(kind,id,fly){
-  const p=(kind==="work"?WORK:PODS).find(x=>x.id===id); if(!p)return;
-  if(S.sel&&markers[S.sel]){const o=S.sel.startsWith("p")?PODS.find(x=>x.id===S.sel):WORK.find(x=>x.id===S.sel);markers[S.sel].setIcon(mkIcon(S.sel.startsWith("p")?"pod":"work",o,false))}
-  S.sel=id; markers[id].setIcon(mkIcon(kind,p,true));
-  const tel=kind==="pod"?telOf(p.contact):telOf(p.phone), mail=kind==="pod"?mailOf(p.contact):"";
-  const d=distKm(p);
-  let h='<button class="back" id="back">← Back to list</button><h2>'+esc(p.name)+'</h2><div class="sub">'+
-    (kind==="work"?esc(p.type)+' · '+esc(p.setting)+' · '+esc(p.area)+', '+esc(p.region):'<span class="tag '+(p.cost==="Free"?"free":"paid")+'">'+esc(p.cost)+'</span>Podcast space · '+esc(p.area)+', '+esc(p.region))+
+function selectPin(id){
+  if(S.sel&&markers[S.sel]&&SPOT[S.sel])markers[S.sel].setIcon(mkIcon(SPOT[S.sel],false));
+  S.sel=id; if(id&&markers[id])markers[id].setIcon(mkIcon(SPOT[id],true));
+}
+function openDetail(id,fly,zoom){
+  const p=SPOT[id];
+  if(!p){const rid=ID2REG[id];if(rid&&!LOADED[rid]){loadRegion(rid).then(()=>{if(SPOT[id])openDetail(id,fly,zoom)});}return}
+  if(!S.q.trim()&&S.city!=="all"&&!regionsOf(S.city).includes(p.rid)){S.city=REG[p.rid].group==="nnm"&&S.city==="northern-nm"?"northern-nm":p.rid;$$(".chip").forEach(x=>x.classList.toggle("on",x.dataset.city===S.city));render()}
+  selectPin(id);
+  const kind=p.kind, tel=telOf(kind==="pod"?p.contact:p.phone), mail=kind==="pod"?mailOf(p.contact):"";
+  const d=distKm(p), nt=noteOf(id);
+  let h='<button class="back" id="back">← Back to list</button><div class="dhead"><h2>'+esc(p.name)+'</h2>'+favBtn(id)+'</div><div class="sub">'+
+    (kind==="work"?esc(p.type)+' · '+esc(p.setting)+' · '+esc(p.area)+', '+esc(REG[p.rid].label):'<span class="tag '+(p.cost==="Free"?"free":"paid")+'">'+esc(p.cost)+'</span>Podcast space · '+esc(p.area)+', '+esc(REG[p.rid].label))+
     (d!=null?' · '+(d/1.609).toFixed(1)+' mi away':'')+'</div>';
   if(kind==="work") h+='<div class="vibe">'+esc(p.vibe)+(p.source?'<br><a href="'+esc(p.source)+'" target="_blank" rel="noopener">Source: '+esc(p.sourceName||"link")+' ↗</a>':'')+'</div>';
   else h+='<div class="vibe">'+esc(p.note)+'<br><a href="'+esc(p.url)+'" target="_blank" rel="noopener">Source: studio page ↗</a></div>';
-  h+='<div class="acts">'+act(dirUrl(p),"Directions",ICON.nav,false,true)+(tel?act("tel:"+tel.replace(/[^\d]/g,""),"Call",ICON.phone,true):'')+(mail?act("mailto:"+mail,"Email",ICON.mail,true):'')+(p.url?act(p.url,"Website",ICON.web,true,true):'')+'</div><dl class="props">';
+  h+='<div class="navrow"><a class="navbtn g" id="navG" href="'+esc(NAV.google(p))+'" target="_blank" rel="noopener">'+ICON.nav+'Google</a><a class="navbtn w" id="navW" href="'+esc(NAV.waze(p))+'" target="_blank" rel="noopener">'+ICON.nav+'Waze</a><a class="navbtn a" id="navA" href="'+esc(NAV.apple(p))+'" target="_blank" rel="noopener">'+ICON.apple+'Apple</a></div>';
+  h+='<div class="navhint">'+(p.navq?'Pin is approximate, so these search for “'+esc(p.navq)+'”.':'Navigates to '+ll(p)+'.')+'</div>';
+  h+='<div class="acts">'+(tel?act("tel:"+tel.replace(/[^\d]/g,""),"Call",ICON.phone,true):'')+(mail?act("mailto:"+mail,"Email",ICON.mail,true):'')+(p.url?act(p.url,"Website",ICON.web,true,true):'')+'</div>';
+  h+='<div class="mynote"><label for="noteBox">My note <span class="st" id="noteSt">'+(nt?"Saved on this device":"Private · saves as you type")+'</span></label><textarea id="noteBox" maxlength="2000" placeholder="e.g. best table by the window; Wi-Fi drops after 3 PM">'+esc(nt)+'</textarea></div>';
+  h+='<div class="sharerow"><button class="sharebtn" id="shareBtn">'+ICON.share+'Share spot</button><label><input type="checkbox" id="shareNote"'+(nt?"":" disabled")+'> Include my note</label></div><dl class="props" style="margin-top:14px">';
   if(kind==="work") h+=prop("Wi-Fi",esc(p.wifi))+prop("Hours",esc(p.hours))+prop("Address",esc(p.address))+prop("Phone",tel?'<a href="tel:'+tel.replace(/[^\d]/g,"")+'">'+esc(p.phone)+'</a>':'')+prop("Website",p.url?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.url.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,""))+'</a>':'');
-  else h+=prop("Rate",esc(p.rate)+'<br><span style="color:var(--ink3);font-size:12px">as listed on '+CHECKED+'</span>')+prop("Hours",esc(p.hours))+prop("Booking",esc(p.book))+prop("Contact",esc(p.contact))+prop("Address",esc(p.address))+prop("Gear",esc(p.note));
+  else h+=prop("Rate",esc(p.rate)+'<br><span style="color:var(--ink3);font-size:12px">as listed when checked ('+esc(p.id.match(/^p\d/)?"Nov 12, 2026":"Nov 13, 2026")+')</span>')+prop("Hours",esc(p.hours))+prop("Booking",esc(p.book))+prop("Contact",esc(p.contact))+prop("Address",esc(p.address))+prop("Gear",esc(p.note));
   h+='</dl>';
   $("#detail").innerHTML=h; $("#detail").classList.add("open"); $("#list").style.display="none"; $("#filters").classList.remove("open"); $("#btnFilter").classList.remove("on");
   $("#body").scrollTop=0;
   $("#back").onclick=closeDetail;
-  if(S.tab!==kind){S.tab=kind;$$(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===kind))}
-  setSheet(window.innerWidth<900?"half":null);
+  let nt0; const box=$("#noteBox");
+  box.addEventListener("input",()=>{$("#noteSt").textContent="Saving…";clearTimeout(nt0);nt0=setTimeout(()=>{setNote(id,box.value);$("#noteSt").textContent=box.value.trim()?"Saved on this device":"Private · saves as you type";$("#shareNote").disabled=!box.value.trim();if(!box.value.trim())$("#shareNote").checked=false},400)});
+  box.addEventListener("focus",()=>{if(!DESK()&&state!=="full"){setSheet("full");setTimeout(()=>box.scrollIntoView({block:"center"}),320)}});
+  box.addEventListener("blur",()=>{clearTimeout(nt0);setNote(id,box.value)});
+  $("#shareBtn").onclick=()=>shareSpot(id,$("#shareNote").checked);
+  if(S.tab!=="saved"&&S.tab!==kind){S.tab=kind;$$(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===kind))}
+  setSheet(DESK()?null:"half");
   if(fly){
-    const z=Math.max(map.getZoom(),14);
-    if(window.innerWidth<900){const pt=map.project([p.lat,p.lng],z).add([0,window.innerHeight*0.2]);map.flyTo(map.unproject(pt,z),z,{duration:.6})}
+    const z=zoom||Math.max(map.getZoom(),14);
+    if(!DESK()){const pt=map.project([p.lat,p.lng],z).add([0,window.innerHeight*0.2]);map.flyTo(map.unproject(pt,z),z,{duration:.6})}
     else map.flyTo([p.lat,p.lng],z,{duration:.6});
     if(kind==="work"&&!map.hasLayer(workLayer))workLayer.addTo(map);
     if(kind==="pod"&&!map.hasLayer(podLayer))podLayer.addTo(map);
+    if(!(kind==="work"?workLayer:podLayer).hasLayer(markers[id]))(kind==="work"?workLayer:podLayer).addLayer(markers[id]);
   }
+  if(location.hash!=="#spot="+id)history.replaceState(null,"","#spot="+encodeURIComponent(id));
 }
 function closeDetail(){
+  if(!$("#detail").classList.contains("open")&&!S.sel)return;
   $("#detail").classList.remove("open");$("#list").style.display="";
-  if(S.sel&&markers[S.sel]){const k=S.sel.startsWith("p")?"pod":"work";markers[S.sel].setIcon(mkIcon(k,(k==="pod"?PODS:WORK).find(x=>x.id===S.sel),false))}
-  S.sel=null; map.closePopup();
+  const box=$("#noteBox"); if(box&&S.sel)setNote(S.sel,box.value);
+  selectPin(null); map.closePopup();
+  if(/^#spot=/.test(location.hash))history.replaceState(null,"","#"+S.city);
+  render();
 }
+/* ---------- share / export / import ---------- */
+const spotUrl=id=>location.origin+location.pathname+"#spot="+encodeURIComponent(id);
+async function shareSpot(id,withNote){
+  const p=SPOT[id], url=spotUrl(id), note=noteOf(id);
+  const text=p.name+" — "+(p.address||"")+(withNote&&note?"\nMy note: "+note:"");
+  if(navigator.share){try{await navigator.share({title:"WNDR: "+p.name,text,url});return}catch(e){if(e&&e.name==="AbortError")return}}
+  const all=text+"\n"+url;
+  try{await navigator.clipboard.writeText(all);toast("Link copied"+(withNote&&note?" with your note":"")+". Paste it anywhere.")}
+  catch(e){window.prompt("Copy this link:",all)}
+}
+function exportSaved(){
+  const data={app:"WNDR",version:1,exported:new Date().toISOString(),favorites:SAVE.favs,notes:SAVE.notes};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="wndr-saved-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+  toast("Exported "+Object.keys(SAVE.favs).length+" favorites and "+Object.keys(SAVE.notes).length+" notes.");
+}
+$("#importFile").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f)return;
+  f.text().then(t=>{
+    const d=JSON.parse(t); if(!d||d.app!=="WNDR"||typeof d.favorites!=="object"||typeof d.notes!=="object")throw new Error("not a WNDR export");
+    let nf=0,nn=0;
+    Object.entries(d.favorites||{}).forEach(([id,v])=>{if(v&&typeof v.name==="string"&&!SAVE.favs[id]){SAVE.favs[id]=v;nf++}});
+    Object.entries(d.notes||{}).forEach(([id,v])=>{if(v&&typeof v.text==="string"&&(!SAVE.notes[id]||(v.t||0)>(SAVE.notes[id].t||0))){SAVE.notes[id]=Object.assign({},v,{text:v.text.slice(0,2000)});nn++}});
+    persist(); updateCounts(); render(); toast("Imported "+nf+" favorites and "+nn+" notes.");
+  }).catch(err=>toast("Import failed: "+err.message+".")).finally(()=>{e.target.value=""});
+});
 
 /* ---------- bottom sheet drag (mobile) ---------- */
 const sheet=$("#sheet");let state="peek";
-function setSheet(s){if(!s||window.innerWidth>=900)return;state=s;sheet.classList.remove("half","full");if(s!=="peek")sheet.classList.add(s)}
+function setSheet(s){if(!s||DESK())return;state=s;sheet.classList.remove("half","full");if(s!=="peek")sheet.classList.add(s)}
 (function(){
   const g=$("#grab");let y0=null,t0=0,base=0,moved=false;
   const H=()=>sheet.getBoundingClientRect().height, peekY=()=>H()-150, pos={peek:()=>peekY(),half:()=>H()*.46,full:()=>0};
-  g.addEventListener("pointerdown",e=>{if(window.innerWidth>=900||e.target.closest(".tab"))return;y0=e.clientY;t0=Date.now();base=pos[state]();moved=false;sheet.classList.add("dragging");g.setPointerCapture(e.pointerId)});
+  g.addEventListener("pointerdown",e=>{if(DESK()||e.target.closest(".tab"))return;y0=e.clientY;t0=Date.now();base=pos[state]();moved=false;sheet.classList.add("dragging");g.setPointerCapture(e.pointerId)});
   g.addEventListener("pointermove",e=>{if(y0==null)return;const dy=e.clientY-y0;if(Math.abs(dy)>4)moved=true;const y=Math.min(peekY(),Math.max(0,base+dy));sheet.style.transform="translateY("+y+"px)"});
   const end=e=>{if(y0==null)return;sheet.classList.remove("dragging");sheet.style.transform="";const dy=e.clientY-y0,v=dy/Math.max(1,Date.now()-t0);y0=null;
     if(!moved){setSheet(state==="peek"?"half":state==="half"?"full":"peek");return}
@@ -635,11 +618,24 @@ function setSheet(s){if(!s||window.innerWidth>=900)return;state=s;sheet.classLis
 })();
 
 /* ---------- UI wiring ---------- */
+const fitOpts=()=>({duration:.7,paddingTopLeft:DESK()?[400,0]:[0,110],paddingBottomRight:DESK()?[0,0]:[0,150]});
 $$(".tab").forEach(t=>t.onclick=()=>{S.tab=t.dataset.tab;$$(".tab").forEach(x=>x.classList.toggle("on",x===t));closeDetail();render();if(state==="peek")setSheet("half")});
-$("#list").addEventListener("click",e=>{const it=e.target.closest(".item");if(it)openDetail(it.dataset.k,it.dataset.id,true)});
-function setCity(c,fit){S.city=c;$$(".chip").forEach(x=>x.classList.toggle("on",x.dataset.city===c));closeDetail();render();if(fit!==false)map.flyToBounds(VIEWS[c],{duration:.7,paddingTopLeft:window.innerWidth>=900?[400,0]:[0,110],paddingBottomRight:window.innerWidth>=900?[0,0]:[0,140]});history.replaceState(null,"","#"+c.toLowerCase().replace(/\s+/g,"-"))}
-$$(".chip").forEach(c=>c.onclick=()=>setCity(c.dataset.city));
-let qt;$("#q").addEventListener("input",e=>{clearTimeout(qt);$("#qclear").style.display=e.target.value?"block":"none";qt=setTimeout(()=>{S.q=e.target.value;closeDetail();render();if(S.q&&state==="peek")setSheet("half")},150)});
+$("#list").addEventListener("click",e=>{
+  const fb=e.target.closest(".fav"); if(fb){e.stopPropagation();toggleFav(fb.dataset.id);return}
+  const it=e.target.closest(".item"); if(it)openDetail(it.dataset.id,true);
+});
+$("#detail").addEventListener("click",e=>{const fb=e.target.closest(".fav");if(fb)toggleFav(fb.dataset.id)});
+function setCity(c,fit){
+  if(!(c==="all"||REG[c]||GRP[c]))c="dallas";
+  S.city=c;$$(".chip").forEach(x=>x.classList.toggle("on",x.dataset.city===c));
+  const on=$('.chip[data-city="'+c+'"]'); if(on)on.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
+  closeDetail();
+  if(c!=="all")loadMany(regionsOf(c));
+  render();
+  if(fit!==false){if(c==="all")map.flyTo([35.5,-102],4,{duration:.7});else map.flyToBounds(viewOf(c),fitOpts())}
+  history.replaceState(null,"","#"+c);
+}
+let qt;$("#q").addEventListener("input",e=>{clearTimeout(qt);$("#qclear").style.display=e.target.value?"block":"none";qt=setTimeout(()=>{S.q=e.target.value;if(S.q.trim().length>=2)loadMany(Object.keys(REG));closeDetail();render();if(S.q&&state==="peek")setSheet("half")},150)});
 $("#qclear").onclick=()=>{$("#q").value="";$("#qclear").style.display="none";S.q="";render()};
 $("#btnFilter").onclick=()=>{closeDetail();const o=$("#filters").classList.toggle("open");$("#btnFilter").classList.toggle("on",o);if(o){setSheet(state==="peek"?"half":state);$("#body").scrollTop=0}};
 $("#fType").onchange=e=>{S.type=e.target.value;if(S.type!=="All")S.tab="work",$$(".tab").forEach(x=>x.classList.toggle("on",x.dataset.tab==="work"));render()};
@@ -647,19 +643,22 @@ $$("#fCost button").forEach(b=>b.onclick=()=>{S.cost=b.dataset.v;$$("#fCost butt
 $("#fOut").onchange=e=>{S.out=e.target.checked;render()};
 $("#fReset").onclick=()=>{S.type="All";S.cost="All";S.out=false;S.q="";$("#fType").value="All";$("#fOut").checked=false;$("#q").value="";$("#qclear").style.display="none";$$("#fCost button").forEach(x=>x.classList.toggle("on",x.dataset.v==="All"));render()};
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),3200)}
+const nearestRegion=ll=>{let best=null,bd=1e12;Object.values(REG).forEach(r=>{const d=map.distance(ll,r.center);if(d<bd){bd=d;best=r}});return{r:best,d:bd}};
 let meMarker=null;
+function placeMe(pos){
+  S.me=L.latLng(pos.coords.latitude,pos.coords.longitude);
+  if(meMarker)meMarker.remove();
+  meMarker=L.marker(S.me,{icon:L.divIcon({className:"",html:'<div class="me"></div>',iconSize:[18,18],iconAnchor:[9,9]}),zIndexOffset:1000,interactive:false}).addTo(map);
+  $("#btnNear").classList.add("on");
+}
 $("#btnNear").onclick=()=>{
   if(!navigator.geolocation)return toast("Location isn't available in this browser.");
   toast("Finding you…");
   navigator.geolocation.getCurrentPosition(pos=>{
-    S.me=L.latLng(pos.coords.latitude,pos.coords.longitude);
-    if(meMarker)meMarker.remove();
-    meMarker=L.marker(S.me,{icon:L.divIcon({className:"",html:'<div class="me"></div>',iconSize:[18,18],iconAnchor:[9,9]}),zIndexOffset:1000,interactive:false}).addTo(map);
-    $("#btnNear").classList.add("on");
-    const inArea=[...WORK,...PODS].some(p=>map.distance(S.me,[p.lat,p.lng])<80000);
-    if(inArea){S.city="All";$$(".chip").forEach(x=>x.classList.toggle("on",x.dataset.city==="All"));map.flyTo(S.me,13,{duration:.8})}
-    else toast("You're outside DFW and Austin; the list is sorted by distance anyway.");
-    closeDetail();render();setSheet("half");
+    placeMe(pos); const {r,d}=nearestRegion(S.me);
+    if(d<120000){setCity(r.id,false);map.flyTo(S.me,13,{duration:.8})}
+    else{setCity(r.id);toast("Nearest WNDR region: "+r.label+" ("+Math.round(d/MI)+" mi). Lists are sorted by distance.")}
+    setSheet("half");
   },err=>toast(err.code===1?"Location permission was denied.":"Couldn't get your location."),{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
 };
 const openHelp=()=>{$("#help").classList.add("open");$("#help .card").scrollTop=0};
@@ -668,15 +667,47 @@ $("#btnHelp").onclick=openHelp;$("#helpClose").onclick=closeHelp;
 $("#help").addEventListener("click",e=>{if(e.target.id==="help")closeHelp()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeHelp()});
 if(location.search.includes("help"))openHelp();
-map.on("click",()=>{if(window.innerWidth<900&&state!=="peek")setSheet("peek")});
+map.on("click",()=>{if(!DESK()&&state!=="peek")setSheet("peek")});
 
 /* ---------- start ---------- */
-const h=decodeURIComponent(location.hash.slice(1)).replace(/-/g," ").toLowerCase();
-const start=Object.keys(VIEWS).find(k=>k.toLowerCase()===h)||"All";
-$$(".chip").forEach(x=>x.classList.toggle("on",x.dataset.city===start));
-S.city=start;render();
-map.fitBounds(VIEWS[start],{paddingTopLeft:window.innerWidth>=900?[400,0]:[0,110],paddingBottomRight:window.innerWidth>=900?[0,0]:[0,140]});
-window.WNDR={map,S,render,openDetail};
+const ALIAS={"fort worth":"fort-worth","oklahoma-city":"okc","oklahoma city":"okc","sandiego":"san-diego","nnm":"northern-nm","northern-new-mexico":"northern-nm"};
+function route(first){
+  const h=decodeURIComponent(location.hash.slice(1));
+  const m=h.match(/^spot=(.+)$/);
+  if(m){const id=m[1],rid=ID2REG[id];
+    if(rid){S.city=REG[rid].group==="nnm"?"northern-nm":rid;$$(".chip").forEach(x=>x.classList.toggle("on",x.dataset.city===S.city));
+      if(first)map.setView(REG[rid].center,11);
+      loadRegion(rid).then(()=>{render();openDetail(id,true,16)});return true}
+    toast("That shared spot isn't in WNDR any more.");}
+  let c=h.toLowerCase().replace(/\s+/g,"-"); c=ALIAS[c]||ALIAS[c.replace(/-/g," ")]||c;
+  if(c==="all"||REG[c]||GRP[c]){setCity(c,!first);if(first){if(c==="all")map.setView([35.5,-102],4);else map.fitBounds(viewOf(c),fitOpts())}return true}
+  return false;
+}
+window.addEventListener("hashchange",()=>route(false));
+fetch("data/index.json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(idx=>{
+  IDX=idx;
+  idx.regions.forEach(r=>{REG[r.id]=r;r.ids.forEach(i=>ID2REG[i]=r.id)});
+  idx.groups.forEach(g=>GRP[g.id]=g);
+  const chip=(id,lab,st,cls)=>'<button class="chip'+(cls?" "+cls:"")+'" data-city="'+id+'">'+esc(lab)+(st?'<span class="st">'+esc(st)+'</span>':'')+'</button>';
+  const order=["dallas","fort-worth","austin","okc","edmond","guthrie","tupelo","northern-nm","santa-fe","taos","red-river","angel-fire","san-diego"];
+  $("#cities").innerHTML=order.map(id=>GRP[id]?chip(id,GRP[id].label,"4 towns","grp"):REG[id]?chip(id,REG[id].label,REG[id].state):"").join("")+chip("all","All","");
+  $$(".chip").forEach(c=>c.onclick=()=>setCity(c.dataset.city));
+  refreshTypes(); updateCounts();
+  if(route(true))return drawBubbles();
+  // default: Dallas, or the nearest region if location is already allowed (never prompts on load)
+  let started=false;
+  const startAt=(id)=>{if(started)return;started=true;setCity(id,false);map.fitBounds(viewOf(id),fitOpts());drawBubbles()};
+  const dallas=()=>startAt("dallas");
+  if(!(navigator.permissions&&navigator.geolocation))return dallas();
+  navigator.permissions.query({name:"geolocation"}).then(p=>{
+    if(p.state!=="granted")return dallas();
+    const t=setTimeout(dallas,4000);
+    navigator.geolocation.getCurrentPosition(pos=>{clearTimeout(t);placeMe(pos);const {r,d}=nearestRegion(S.me);
+      if(started){render();return}
+      startAt(d<120000?r.id:"dallas");if(d<120000)map.setView(S.me,13)},()=>{clearTimeout(t);dallas()},{timeout:4000,maximumAge:300000});
+  }).catch(dallas);
+}).catch(e=>{$("#list").innerHTML='<div class="empty">Couldn\'t load the region index ('+esc(e.message)+'). WNDR needs to be opened from a web server (it doesn\'t work as a local file).</div>'});
+window.WNDR={map,S,render,openDetail,loadRegion,LOADED,SAVE,NAV,SPOT};
 })();
 </script>
 </body>
