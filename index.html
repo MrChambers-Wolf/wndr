@@ -65,7 +65,8 @@ a{color:var(--work)}
 #top .row{display:flex;gap:8px;align-items:center;pointer-events:auto}
 #brand{background:var(--ink);color:#f4efe6;border-radius:14px;height:46px;padding:0 14px;display:flex;align-items:center;font-weight:700;letter-spacing:.22em;font-size:15px;box-shadow:var(--shadow);flex:none}
 #searchwrap{flex:1;position:relative;min-width:0}
-#q{width:100%;height:46px;border:0;border-radius:14px;padding:0 40px 0 14px;background:var(--panel);box-shadow:var(--shadow);outline:none;font-size:16px}
+#q{width:100%;height:46px;border:0;border-radius:14px;padding:0 40px 0 14px;background:var(--panel);box-shadow:var(--shadow);outline:none;font-size:16px;appearance:none;-webkit-appearance:none}
+#q::-webkit-search-decoration,#q::-webkit-search-cancel-button{display:none;-webkit-appearance:none}
 #qclear{position:absolute;right:4px;top:3px;width:40px;height:40px;border:0;background:none;font-size:20px;color:var(--ink3);display:none;cursor:pointer}
 .iconbtn{width:46px;height:46px;flex:none;border:0;border-radius:14px;background:var(--panel);box-shadow:var(--shadow);display:grid;place-items:center;cursor:pointer}
 .iconbtn svg{width:22px;height:22px}
@@ -107,14 +108,16 @@ a{color:var(--work)}
 .pin.sel i{transform:scale(1.35);box-shadow:0 0 0 6px rgba(255,255,255,.55),0 4px 14px rgba(0,0,0,.4)}
 .me{width:18px;height:18px;border-radius:50%;background:#3b82f6;border:3px solid #fff;box-shadow:0 0 0 8px rgba(59,130,246,.25)}
 /* sheet */
-#sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--panel);border-radius:var(--radius) var(--radius) 0 0;box-shadow:0 -8px 30px rgba(20,30,30,.25);height:88vh;height:88dvh;transform:translateY(calc(100% - var(--peek)));transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;--peek:168px;touch-action:none}
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--panel);border-radius:var(--radius) var(--radius) 0 0;box-shadow:0 -8px 30px rgba(20,30,30,.25);height:88vh;height:88dvh;transform:translateY(calc(100% - var(--peek)));transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;--peek:184px;touch-action:none}
 #sheet.half{transform:translateY(46%)}
 #sheet.full{transform:translateY(0)}
 #sheet.dragging{transition:none}
 #grab{flex:none;padding:8px 16px 6px;cursor:grab;touch-action:none}
 #grab .bar{width:44px;height:5px;border-radius:3px;background:rgba(34,48,47,.25);margin:0 auto 10px}
-#tabs{display:flex;gap:6px}
-.tab{flex:1;height:44px;border-radius:12px;border:0;background:var(--chip);font-weight:700;font-size:14px;color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+#tabs{display:flex;gap:6px;align-items:center;min-width:0}
+.tab{flex:1;height:44px;border-radius:12px;border:0;background:var(--chip);font-weight:700;font-size:14px;color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;padding:0 6px;white-space:nowrap}
+#tabs #btnFilter{width:44px;height:44px;flex:none;box-shadow:none;background:var(--chip)}
+#tabs #btnFilter.on{background:var(--ink);color:#fff}
 .tab.on{background:var(--ink);color:#fff}
 .tab .dot{width:10px;height:10px;border-radius:50%}
 #credit{font-size:11.5px;color:var(--ink3);margin-top:3px;letter-spacing:.02em}
@@ -132,7 +135,7 @@ a{color:var(--work)}
 #help .close{position:sticky;top:0;float:right;width:44px;height:44px;border-radius:12px;border:0;background:var(--chip);font-size:22px;cursor:pointer}
 #help .warn{background:#f6ead9;color:#7a4f17;border-radius:12px;padding:10px 12px;font-size:14px;margin-top:14px}
 @media (min-width:900px){#help .card{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:560px;border-radius:var(--radius);max-height:86vh}}
-#summary{font-size:12.5px;color:var(--ink2);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#summary{font-size:12.5px;color:var(--ink2);margin-top:8px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
 #body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 12px calc(env(safe-area-inset-bottom) + 20px);touch-action:pan-y}
 #filters{display:none;padding:10px 4px 6px;border-bottom:1px solid var(--line);margin-bottom:6px}
 #filters.open{display:block}
@@ -233,7 +236,32 @@ dl.props dd{margin:0;word-break:break-word}
 #credit{margin-top:1px}
 #help .tagline-help{font-size:14px;color:var(--work);margin:4px 0 2px;letter-spacing:.02em}
 #help .tagline-help b{font-weight:800}
-@media (max-width:380px){#top .row{gap:6px}.iconbtn{width:40px}#brand{padding:0 10px;letter-spacing:.14em;font-size:14px}#q{padding:0 34px 0 12px}}
+/* Phones: search gets its own row so it stays typable; filter lives with the tabs. */
+@media (max-width:599px){
+  #top{padding:calc(env(safe-area-inset-top) + 8px) 8px 0}
+  #top .row{display:grid;grid-template-columns:auto 1fr auto auto;grid-template-areas:"brand . help near" "search search search search";gap:8px 6px;align-items:center}
+  #brand{grid-area:brand;height:42px;padding:0 12px;letter-spacing:.16em;font-size:14px;border-radius:12px}
+  #searchwrap{grid-area:search;min-width:0}
+  #btnHelp{grid-area:help}
+  #btnNear{grid-area:near}
+  .iconbtn{width:42px;height:42px;border-radius:12px}
+  #q{height:42px;padding:0 36px 0 14px}
+  #qclear{top:1px;width:40px;height:40px}
+  #cities{margin-top:8px}
+  .chip{height:34px;padding:0 12px;font-size:13px}
+  .leaflet-top.leaflet-right{top:calc(env(safe-area-inset-top) + 154px)}
+  #grab{padding-left:12px;padding-right:12px}
+  #tabs{gap:4px}
+  .tab{font-size:12.5px;gap:4px;padding:0 4px;height:42px}
+  .tab .dot{width:8px;height:8px}
+  .tab .heart{width:12px;height:12px}
+  #tabs #btnFilter{width:42px;height:42px;border-radius:12px}
+  #tabs #btnFilter svg{width:20px;height:20px}
+}
+@media (max-width:359px){
+  .tab{font-size:12px;padding:0 3px}
+  #tabs #btnFilter{width:38px;height:38px}
+}
 
 </style>
 </head>
@@ -245,7 +273,6 @@ dl.props dd{margin:0;word-break:break-word}
     <div id="brand" title="WNDR = Wi-Fi · Nooks · Drinks · Recording" aria-label="WNDR: Wi-Fi, Nooks, Drinks, Recording">WNDR</div>
     <div id="searchwrap"><input id="q" type="search" placeholder="Search…" autocomplete="off" aria-label="Search"><button id="qclear" aria-label="Clear search">×</button></div>
     <button class="iconbtn" id="btnHelp" aria-label="How to use" title="How to use"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.3-2.5 3.8"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/></svg></button>
-    <button class="iconbtn" id="btnFilter" aria-label="Filters" title="Filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></button>
     <button class="iconbtn" id="btnNear" aria-label="Near me" title="Near me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
   </div>
   <div id="cities" role="tablist" aria-label="Regions"></div>
@@ -258,6 +285,7 @@ dl.props dd{margin:0;word-break:break-word}
       <button class="tab on" data-tab="work"><span class="dot" style="background:var(--work)"></span>Work <span id="cWork"></span></button>
       <button class="tab" data-tab="pod"><span class="dot" style="background:var(--pod)"></span>Podcast <span id="cPod"></span></button>
       <button class="tab" data-tab="saved"><svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.1 5.2 3 1.6-1.9 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>Saved <span id="cSaved"></span></button>
+      <button class="iconbtn" id="btnFilter" aria-label="Filters" title="Filters" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></button>
     </div>
     <div id="summary"></div>
     <div id="tagline"><b>W</b>i-Fi · <b>N</b>ooks · <b>D</b>rinks · <b>R</b>ecording</div>
@@ -286,7 +314,7 @@ dl.props dd{margin:0;word-break:break-word}
       <li><span class="k">🏙</span><span><b>Region chips</b> scroll sideways: Dallas, Fort Worth, Austin, OKC, Edmond, Guthrie, Tupelo, Northern NM (Santa Fe, Taos, Red River and Angel Fire together), each NM town, San Diego, and All. Tap one to jump there; its spots load only then, so the app stays fast.</span></li>
       <li><span class="k">🗺</span><span><b>Pan or zoom</b> into a region and its spots load automatically. Zoomed out, dark bubbles mark each region with its spot count; tap one to go there.</span></li>
       <li><span class="k">🔎</span><span><b>Search</b> looks through names, neighborhoods, vibe notes, rates, booking notes <b>and your own notes</b>, across every region.</span></li>
-      <li><span class="k">☰</span><span><b>Filters</b>: work spot type, free or paid podcast spaces, and outdoor seating only. “Reset all” clears them.</span></li>
+      <li><span class="k">☰</span><span><b>Filters</b> (the button at the end of the Work / Podcast / Saved row): work spot type, free or paid podcast spaces, and outdoor seating only. “Reset all” clears them.</span></li>
       <li><span class="k">◎</span><span><b>Near me</b> uses your location, jumps to the nearest WNDR region and sorts the lists by distance. If you've already allowed location, WNDR opens on your nearest region; otherwise it opens on Dallas.</span></li>
       <li><span class="k">↕</span><span><b>Bottom panel</b>: swipe it up or down, or tap the handle. Tabs: Work, Podcast and Saved.</span></li>
       <li><span class="k">📍</span><span><b>Tap a pin or a list row</b> for details: the vibe note and its source, hours, Wi-Fi, and buttons for Call, Email and Website.</span></li>
@@ -555,7 +583,7 @@ function openDetail(id,fly,zoom){
   if(kind==="work") h+=prop("Wi-Fi",esc(p.wifi))+prop("Hours",esc(p.hours))+prop("Address",esc(p.address))+prop("Phone",tel?'<a href="tel:'+tel.replace(/[^\d]/g,"")+'">'+esc(p.phone)+'</a>':'')+prop("Website",p.url?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.url.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,""))+'</a>':'');
   else h+=prop("Rate",esc(p.rate)+'<br><span style="color:var(--ink3);font-size:12px">as listed when checked ('+esc(p.id.match(/^p\d/)?"Nov 12, 2026":"Nov 13, 2026")+')</span>')+prop("Hours",esc(p.hours))+prop("Booking",esc(p.book))+prop("Contact",esc(p.contact))+prop("Address",esc(p.address))+prop("Gear",esc(p.note));
   h+='</dl>';
-  $("#detail").innerHTML=h; $("#detail").classList.add("open"); $("#list").style.display="none"; $("#filters").classList.remove("open"); $("#btnFilter").classList.remove("on");
+  $("#detail").innerHTML=h; $("#detail").classList.add("open"); $("#list").style.display="none"; $("#filters").classList.remove("open"); $("#btnFilter").classList.remove("on"); $("#btnFilter").setAttribute("aria-expanded","false");
   $("#body").scrollTop=0;
   $("#back").onclick=closeDetail;
   let nt0; const box=$("#noteBox");
@@ -616,8 +644,8 @@ const sheet=$("#sheet");let state="peek";
 function setSheet(s){if(!s||DESK())return;state=s;sheet.classList.remove("half","full");if(s!=="peek")sheet.classList.add(s)}
 (function(){
   const g=$("#grab");let y0=null,t0=0,base=0,moved=false;
-  const H=()=>sheet.getBoundingClientRect().height, peekY=()=>H()-168, pos={peek:()=>peekY(),half:()=>H()*.46,full:()=>0};
-  g.addEventListener("pointerdown",e=>{if(DESK()||e.target.closest(".tab"))return;y0=e.clientY;t0=Date.now();base=pos[state]();moved=false;sheet.classList.add("dragging");g.setPointerCapture(e.pointerId)});
+  const H=()=>sheet.getBoundingClientRect().height, peekPx=()=>parseFloat(getComputedStyle(sheet).getPropertyValue("--peek"))||184, peekY=()=>H()-peekPx(), pos={peek:()=>peekY(),half:()=>H()*.46,full:()=>0};
+  g.addEventListener("pointerdown",e=>{if(DESK()||e.target.closest(".tab, #btnFilter, button, a, input, select, textarea"))return;y0=e.clientY;t0=Date.now();base=pos[state]();moved=false;sheet.classList.add("dragging");g.setPointerCapture(e.pointerId)});
   g.addEventListener("pointermove",e=>{if(y0==null)return;const dy=e.clientY-y0;if(Math.abs(dy)>4)moved=true;const y=Math.min(peekY(),Math.max(0,base+dy));sheet.style.transform="translateY("+y+"px)"});
   const end=e=>{if(y0==null)return;sheet.classList.remove("dragging");sheet.style.transform="";const dy=e.clientY-y0,v=dy/Math.max(1,Date.now()-t0);y0=null;
     if(!moved){setSheet(state==="peek"?"half":state==="half"?"full":"peek");return}
@@ -627,7 +655,7 @@ function setSheet(s){if(!s||DESK())return;state=s;sheet.classList.remove("half",
 })();
 
 /* ---------- UI wiring ---------- */
-const fitOpts=()=>({duration:.7,paddingTopLeft:DESK()?[400,0]:[0,110],paddingBottomRight:DESK()?[0,0]:[0,168]});
+const fitOpts=()=>({duration:.7,paddingTopLeft:DESK()?[400,0]:[0,innerWidth<=599?160:110],paddingBottomRight:DESK()?[0,0]:[0,184]});
 $$(".tab").forEach(t=>t.onclick=()=>{S.tab=t.dataset.tab;$$(".tab").forEach(x=>x.classList.toggle("on",x===t));closeDetail();render();if(state==="peek")setSheet("half")});
 $("#list").addEventListener("click",e=>{
   const fb=e.target.closest(".fav"); if(fb){e.stopPropagation();toggleFav(fb.dataset.id);return}
@@ -646,7 +674,7 @@ function setCity(c,fit){
 }
 let qt;$("#q").addEventListener("input",e=>{clearTimeout(qt);$("#qclear").style.display=e.target.value?"block":"none";qt=setTimeout(()=>{S.q=e.target.value;if(S.q.trim().length>=2)loadMany(Object.keys(REG));closeDetail();render();if(S.q&&state==="peek")setSheet("half")},150)});
 $("#qclear").onclick=()=>{$("#q").value="";$("#qclear").style.display="none";S.q="";render()};
-$("#btnFilter").onclick=()=>{closeDetail();const o=$("#filters").classList.toggle("open");$("#btnFilter").classList.toggle("on",o);if(o){setSheet(state==="peek"?"half":state);$("#body").scrollTop=0}};
+$("#btnFilter").onclick=()=>{closeDetail();const o=$("#filters").classList.toggle("open");$("#btnFilter").classList.toggle("on",o);$("#btnFilter").setAttribute("aria-expanded",o?"true":"false");if(o){setSheet(state==="peek"?"half":state);$("#body").scrollTop=0}};
 $("#fType").onchange=e=>{S.type=e.target.value;if(S.type!=="All")S.tab="work",$$(".tab").forEach(x=>x.classList.toggle("on",x.dataset.tab==="work"));render()};
 $$("#fCost button").forEach(b=>b.onclick=()=>{S.cost=b.dataset.v;$$("#fCost button").forEach(x=>x.classList.toggle("on",x===b));if(S.cost!=="All")S.tab="pod",$$(".tab").forEach(x=>x.classList.toggle("on",x.dataset.tab==="pod"));render()});
 $("#fOut").onchange=e=>{S.out=e.target.checked;render()};
