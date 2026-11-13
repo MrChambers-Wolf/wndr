@@ -1,5 +1,7 @@
 # WNDR
 
+**WNDR = Wi-Fi · Nooks · Drinks · Recording**
+
 *Presented by Chambers Creations, LLC*
 
 Calm places to work from a laptop or have a private conversation, plus a toggleable layer of **podcast recording spaces** (free library studios first, then low-cost paid studios), in the places Wes travels:
