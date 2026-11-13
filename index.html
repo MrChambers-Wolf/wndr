@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2214%22 fill=%22%232f8f83%22/%3E%3C/svg%3E">
 <meta name="theme-color" content="#1f2a2e">
-<title>WNDR · calm places to work &amp; record — DFW + Austin</title>
+<title>WNDR · calm places to work &amp; record — DFW + Austin · Presented by Chambers Creations, LLC</title>
+<meta name="description" content="WNDR: chill work spots and podcast studios across Dallas, Fort Worth, and Austin. Presented by Chambers Creations, LLC.">
+<meta name="author" content="Chambers Creations, LLC">
+<meta property="og:title" content="WNDR — presented by Chambers Creations, LLC">
+<meta property="og:description" content="Chill work spots and podcast studios across Dallas, Fort Worth, and Austin.">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
@@ -153,7 +157,7 @@ a{color:var(--work)}
 .pin.sel i{transform:scale(1.35);box-shadow:0 0 0 6px rgba(255,255,255,.55),0 4px 14px rgba(0,0,0,.4)}
 .me{width:18px;height:18px;border-radius:50%;background:#3b82f6;border:3px solid #fff;box-shadow:0 0 0 8px rgba(59,130,246,.25)}
 /* sheet */
-#sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--panel);border-radius:var(--radius) var(--radius) 0 0;box-shadow:0 -8px 30px rgba(20,30,30,.25);height:88vh;height:88dvh;transform:translateY(calc(100% - var(--peek)));transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;--peek:132px;touch-action:none}
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:1100;background:var(--panel);border-radius:var(--radius) var(--radius) 0 0;box-shadow:0 -8px 30px rgba(20,30,30,.25);height:88vh;height:88dvh;transform:translateY(calc(100% - var(--peek)));transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;--peek:150px;touch-action:none}
 #sheet.half{transform:translateY(46%)}
 #sheet.full{transform:translateY(0)}
 #sheet.dragging{transition:none}
@@ -163,6 +167,21 @@ a{color:var(--work)}
 .tab{flex:1;height:44px;border-radius:12px;border:0;background:var(--chip);font-weight:700;font-size:14px;color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
 .tab.on{background:var(--ink);color:#fff}
 .tab .dot{width:10px;height:10px;border-radius:50%}
+#credit{font-size:11.5px;color:var(--ink3);margin-top:3px;letter-spacing:.02em}
+#credit b{font-weight:600;color:var(--ink2)}
+#help{position:fixed;inset:0;z-index:3000;display:none;background:rgba(20,28,28,.45);backdrop-filter:blur(2px)}
+#help.open{display:block}
+#help .card{position:absolute;left:0;right:0;bottom:0;max-height:90vh;max-height:90dvh;overflow-y:auto;background:var(--panel);border-radius:var(--radius) var(--radius) 0 0;padding:18px 18px calc(env(safe-area-inset-bottom) + 24px);box-shadow:var(--shadow);overscroll-behavior:contain}
+#help h2{margin:0;font-size:20px;letter-spacing:.04em}
+#help .by{font-size:12.5px;color:var(--ink2);margin:2px 0 12px}
+#help h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:16px 0 6px}
+#help p,#help li{font-size:14.5px;line-height:1.5;margin:0 0 6px}
+#help ul{padding-left:0;list-style:none;margin:0}
+#help li{display:flex;gap:10px;align-items:flex-start}
+#help li .k{flex:none;width:22px;display:flex;justify-content:center;padding-top:3px}
+#help .close{position:sticky;top:0;float:right;width:44px;height:44px;border-radius:12px;border:0;background:var(--chip);font-size:22px;cursor:pointer}
+#help .warn{background:#f6ead9;color:#7a4f17;border-radius:12px;padding:10px 12px;font-size:14px;margin-top:14px}
+@media (min-width:900px){#help .card{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:560px;border-radius:var(--radius);max-height:86vh}}
 #summary{font-size:12.5px;color:var(--ink2);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 12px calc(env(safe-area-inset-bottom) + 20px);touch-action:pan-y}
 #filters{display:none;padding:10px 4px 6px;border-bottom:1px solid var(--line);margin-bottom:6px}
@@ -225,7 +244,8 @@ dl.props dd{margin:0;word-break:break-word}
 <div id="top">
   <div class="row">
     <div id="brand">WNDR</div>
-    <div id="searchwrap"><input id="q" type="search" placeholder="Search spots, areas, vibes…" autocomplete="off" aria-label="Search"><button id="qclear" aria-label="Clear search">×</button></div>
+    <div id="searchwrap"><input id="q" type="search" placeholder="Search…" autocomplete="off" aria-label="Search"><button id="qclear" aria-label="Clear search">×</button></div>
+    <button class="iconbtn" id="btnHelp" aria-label="How to use" title="How to use"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.3-2.5 3.8"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/></svg></button>
     <button class="iconbtn" id="btnFilter" aria-label="Filters" title="Filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></button>
     <button class="iconbtn" id="btnNear" aria-label="Near me" title="Near me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
   </div>
@@ -245,6 +265,7 @@ dl.props dd{margin:0;word-break:break-word}
       <button class="tab" data-tab="pod"><span class="dot" style="background:var(--pod)"></span>Podcast <span id="cPod"></span></button>
     </div>
     <div id="summary"></div>
+    <div id="credit">Presented by <b>Chambers Creations, LLC</b></div>
   </div>
   <div id="body">
     <div id="filters">
@@ -255,6 +276,35 @@ dl.props dd{margin:0;word-break:break-word}
     </div>
     <div id="list"></div>
     <div id="detail"></div>
+  </div>
+</div>
+<div id="help" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="card">
+    <button class="close" id="helpClose" aria-label="Close">×</button>
+    <h2 id="helpTitle">How to use WNDR</h2>
+    <div class="by">Presented by Chambers Creations, LLC</div>
+    <h3>Get around</h3>
+    <ul>
+      <li><span class="k">🏙</span><span><b>City chips</b> (All, Dallas, Fort Worth, Austin) jump the map to that city and filter the list.</span></li>
+      <li><span class="k">🔎</span><span><b>Search</b> looks through names, neighborhoods, vibe notes, rates and booking notes.</span></li>
+      <li><span class="k">☰</span><span><b>Filters</b>: work spot type, free or paid podcast spaces, and outdoor seating only. “Reset all” clears them.</span></li>
+      <li><span class="k">◎</span><span><b>Near me</b> uses your phone's location, drops a blue dot and sorts both lists by distance.</span></li>
+      <li><span class="k">↕</span><span><b>Bottom panel</b>: swipe it up or down, or tap the handle, to switch between peek, half and full. Tap the map to tuck it away. Switch between the Work and Podcast tabs.</span></li>
+      <li><span class="k">📍</span><span><b>Tap a pin or a list row</b> for details: the vibe note and its source, hours, Wi-Fi notes, and big buttons for Directions (Google Maps), Call, Email and Website.</span></li>
+    </ul>
+    <h3>Layers (stack button, top right)</h3>
+    <ul>
+      <li><span class="k"><span class="sw" style="background:var(--work);margin:0"></span></span><span><b>Work spots</b>: calm cafés, bookstores, libraries, hotel lobbies and patios good for a laptop or a private talk.</span></li>
+      <li><span class="k"><span class="sw" style="background:var(--pod);margin:0"></span></span><span><b>Podcast spaces</b>: a filled purple mic pin is <b>free</b> (mostly library studios); a white pin with a purple ring is <b>paid</b>.</span></li>
+      <li><span class="k"><span class="sw" style="background:#f0b26b;margin:0"></span></span><span><b>Chill zones</b>: a soft amber glow around each spot; the deeper the glow, the more good spots are clustered there.</span></li>
+      <li><span class="k"><span class="sw" style="background:#3f6e8c;margin:0"></span></span><span><b>City boundaries</b>: dashed outlines of Dallas, Fort Worth, Austin and nearby cities from OpenStreetMap.</span></li>
+      <li><span class="k"><span class="sw" style="background:#5fb07c;margin:0"></span></span><span><b>5-mile rings</b>: green rings show what's within 5 miles of a free studio; dashed amber rings do the same for paid studios.</span></li>
+      <li><span class="k"><span class="sw" style="background:#5878a8;margin:0"></span></span><span><b>Library branches</b>: public and campus libraries from OpenStreetMap, not individually checked like the main spots.</span></li>
+      <li><span class="k">🗺</span><span><b>Basemaps</b>: OpenStreetMap (default), Calm (muted), Night (dimmed) and Humanitarian.</span></li>
+    </ul>
+    <h3>Keep it on your phone</h3>
+    <p>In Chrome on Android, tap the ⋮ menu, then <b>Add to Home screen</b>. On iPhone Safari, tap Share, then <b>Add to Home Screen</b>. WNDR then opens like an app (it needs a connection for the map).</p>
+    <div class="warn"><b>Call ahead.</b> Hours and studio rates were checked from each place's site on Nov 12, 2026 and can change. Confirm by phone before you head out or book a session.</div>
   </div>
 </div>
 <div id="toast"></div>
@@ -529,7 +579,7 @@ function notesHtml(){
   const srcs={};WORK.forEach(w=>{if(w.source)srcs[w.source]=w.sourceName});
   return '<div class="notes"><h4>Before you go</h4><ul>'+CAVEATS.map(c=>'<li>'+esc(c)+'</li>').join("")+'</ul><h4>Sources</h4><ul>'+
     Object.keys(srcs).map(u=>'<li><a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(srcs[u])+'</a></li>').join("")+
-    '</ul><p style="margin-top:12px">Links checked '+CHECKED+'. Map data © OpenStreetMap contributors. Basemap tiles: OpenStreetMap (Calm and Night are OSM tiles with a color tint) and OSM France Humanitarian. Boundaries and library points from OpenStreetMap via Nominatim.</p></div>';
+    '</ul><p style="margin-top:12px">Links checked '+CHECKED+'. Map data © OpenStreetMap contributors. Basemap tiles: OpenStreetMap (Calm and Night are OSM tiles with a color tint) and OSM France Humanitarian. Boundaries and library points from OpenStreetMap via Nominatim.</p><p style="margin-top:8px">WNDR is presented by <b>Chambers Creations, LLC</b>.</p></div>';
 }
 
 /* ---------- detail ---------- */
@@ -574,7 +624,7 @@ const sheet=$("#sheet");let state="peek";
 function setSheet(s){if(!s||window.innerWidth>=900)return;state=s;sheet.classList.remove("half","full");if(s!=="peek")sheet.classList.add(s)}
 (function(){
   const g=$("#grab");let y0=null,t0=0,base=0,moved=false;
-  const H=()=>sheet.getBoundingClientRect().height, peekY=()=>H()-132, pos={peek:()=>peekY(),half:()=>H()*.46,full:()=>0};
+  const H=()=>sheet.getBoundingClientRect().height, peekY=()=>H()-150, pos={peek:()=>peekY(),half:()=>H()*.46,full:()=>0};
   g.addEventListener("pointerdown",e=>{if(window.innerWidth>=900||e.target.closest(".tab"))return;y0=e.clientY;t0=Date.now();base=pos[state]();moved=false;sheet.classList.add("dragging");g.setPointerCapture(e.pointerId)});
   g.addEventListener("pointermove",e=>{if(y0==null)return;const dy=e.clientY-y0;if(Math.abs(dy)>4)moved=true;const y=Math.min(peekY(),Math.max(0,base+dy));sheet.style.transform="translateY("+y+"px)"});
   const end=e=>{if(y0==null)return;sheet.classList.remove("dragging");sheet.style.transform="";const dy=e.clientY-y0,v=dy/Math.max(1,Date.now()-t0);y0=null;
@@ -612,6 +662,12 @@ $("#btnNear").onclick=()=>{
     closeDetail();render();setSheet("half");
   },err=>toast(err.code===1?"Location permission was denied.":"Couldn't get your location."),{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
 };
+const openHelp=()=>{$("#help").classList.add("open");$("#help .card").scrollTop=0};
+const closeHelp=()=>$("#help").classList.remove("open");
+$("#btnHelp").onclick=openHelp;$("#helpClose").onclick=closeHelp;
+$("#help").addEventListener("click",e=>{if(e.target.id==="help")closeHelp()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeHelp()});
+if(location.search.includes("help"))openHelp();
 map.on("click",()=>{if(window.innerWidth<900&&state!=="peek")setSheet("peek")});
 
 /* ---------- start ---------- */
